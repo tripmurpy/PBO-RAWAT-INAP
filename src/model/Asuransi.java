@@ -14,8 +14,8 @@ public class Asuransi {
 
     // ========== FIELD PRIVATE (ENCAPSULATION) ==========
     private String id;
-    private String namaAsuransi;  // Nama perusahaan asuransi
-    private String tipeKlaim;     // BPJS / Mandiri / Swasta
+    private String namaAsuransi; // Nama perusahaan asuransi
+    private String tipeKlaim; // BPJS / Mandiri / Swasta
 
     // ========== KONSTRUKTOR ==========
 

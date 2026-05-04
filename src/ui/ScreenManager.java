@@ -16,9 +16,10 @@ public class ScreenManager {
     private static ScreenManager instance;
     private Display display;
     private MIDlet midlet;
-    private Displayable layarSebelumnya;
+    private java.util.Vector historyStack;
 
     private ScreenManager() {
+        historyStack = new java.util.Vector();
     }
 
     /** Mendapatkan instance Singleton */
@@ -37,22 +38,31 @@ public class ScreenManager {
 
     /** Menampilkan layar baru */
     public void tampilkanLayar(Displayable layar) {
-        this.layarSebelumnya = display.getCurrent();
+        Displayable current = display.getCurrent();
+        if (current != null) {
+            historyStack.addElement(current);
+        }
         display.setCurrent(layar);
     }
 
     /** Kembali ke layar sebelumnya */
     public void kembali() {
-        if (layarSebelumnya != null) {
-            display.setCurrent(layarSebelumnya);
-            layarSebelumnya = null; // Clear after use in this simple manager
+        if (!historyStack.isEmpty()) {
+            int last = historyStack.size() - 1;
+            Displayable prev = (Displayable) historyStack.elementAt(last);
+            historyStack.removeElementAt(last);
+            display.setCurrent(prev);
         }
     }
 
     /** Logout: reset state and show LoginScreen */
     public void logout() {
-        this.layarSebelumnya = null;
+        historyStack.removeAllElements();
         display.setCurrent(new LoginScreen());
+    }
+
+    public boolean bisaKembali() {
+        return !historyStack.isEmpty();
     }
 
     /** Mendapatkan Display */

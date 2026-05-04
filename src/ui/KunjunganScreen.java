@@ -2,9 +2,10 @@ package ui;
 
 import javax.microedition.lcdui.*;
 import java.util.Vector;
-import controller.KunjunganController;
+import service.KunjunganService;
 import model.Kunjungan;
 import util.DateUtil;
+import util.ServiceFactory;
 
 /**
  * KunjunganScreen — Riwayat kunjungan / admisi.
@@ -12,12 +13,12 @@ import util.DateUtil;
  */
 public class KunjunganScreen extends Form implements CommandListener {
 
-    private KunjunganController controller;
+    private KunjunganService kunjunganService;
     private Command cmdKembali, cmdRefresh;
 
     public KunjunganScreen() {
         super("RIWAYAT KUNJUNGAN");
-        this.controller = new KunjunganController();
+        this.kunjunganService = ServiceFactory.getInstance().getKunjunganService();
 
         muatRiwayat();
 
@@ -31,11 +32,12 @@ public class KunjunganScreen extends Form implements CommandListener {
     private void muatRiwayat() {
         deleteAll();
         try {
-            Vector list = controller.getRiwayatKunjungan();
+            Vector list = kunjunganService.getRiwayatKunjungan();
             if (list.size() == 0) {
                 append(new StringItem("", "Belum ada riwayat kunjungan."));
             } else {
-                append(new StringItem("", new StringBuffer().append("Total: ").append(list.size()).append(" kunjungan\n").toString()));
+                append(new StringItem("",
+                        new StringBuffer().append("Total: ").append(list.size()).append(" kunjungan\n").toString()));
                 for (int i = 0; i < list.size(); i++) {
                     Kunjungan k = (Kunjungan) list.elementAt(i);
                     StringBuffer sb = new StringBuffer();
@@ -49,7 +51,8 @@ public class KunjunganScreen extends Form implements CommandListener {
                     sb.append("Status  : ").append(k.getStatus()).append("\n");
                     sb.append("Diagnosa: ").append(k.getDiagnosis());
 
-                    StringItem si = new StringItem(new StringBuffer().append("--- #").append(i + 1).append(" ---").toString(), sb.toString());
+                    StringItem si = new StringItem(
+                            new StringBuffer().append("--- #").append(i + 1).append(" ---").toString(), sb.toString());
                     append(si);
                     append(new Spacer(getWidth(), 5));
                 }

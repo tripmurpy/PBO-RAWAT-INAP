@@ -16,17 +16,18 @@ public class Admisi {
 
     // ========== FIELD PRIVATE (ENCAPSULATION) ==========
     private int recordId;
-    private String idAdmisi;       // ID Admisi (ADM-YYYY-XXXX)
-    private String noRMPasien;     // No. RM pasien terkait
-    private String idDokter;       // ID dokter penanggung jawab
-    private String idRuangan;      // ID ruangan/kamar
-    private long tglMasuk;         // Tanggal masuk rawat inap (ms)
-    private long tglKeluar;        // Tanggal keluar (ms), 0 jika belum
-    private String diagnosisAwal;  // Diagnosis awal saat masuk
+    private String idAdmisi; // ID Admisi (ADM-YYYY-XXXX)
+    private String noRMPasien; // No. RM pasien terkait
+    private String idDokter; // ID dokter penanggung jawab
+    private String idRuangan; // ID ruangan/kamar
+    private long tglMasuk; // Tanggal masuk rawat inap (ms)
+    private long tglKeluar; // Tanggal keluar (ms), 0 jika belum
+    private String diagnosisAwal; // Diagnosis awal saat masuk
     private String diagnosisAkhir; // Diagnosis akhir saat keluar
-    private String kodeICD10;      // Kode ICD-10 diagnosis
-    private String catatan;        // Catatan tambahan
-    private String status;         // AKTIF / SELESAI
+    private String kodeICD10; // Kode ICD-10 diagnosis
+    private String catatan; // Catatan tambahan
+    private String status; // AKTIF / SELESAI
+    private int biayaTotal; // Total biaya rawat inap
 
     // ========== KONSTRUKTOR ==========
 
@@ -38,8 +39,8 @@ public class Admisi {
         this.catatan = "";
     }
 
-    public Admisi(String idAdmisi, String noRMPasien, String idDokter, 
-                  String idRuangan, long tglMasuk, String diagnosisAwal) {
+    public Admisi(String idAdmisi, String noRMPasien, String idDokter,
+            String idRuangan, long tglMasuk, String diagnosisAwal) {
         this.idAdmisi = idAdmisi;
         this.noRMPasien = noRMPasien;
         this.idDokter = idDokter;
@@ -167,9 +168,28 @@ public class Admisi {
         this.status = status;
     }
 
+    public int getBiayaTotal() {
+        return biayaTotal;
+    }
+
+    public void setBiayaTotal(int biayaTotal) {
+        this.biayaTotal = biayaTotal;
+    }
+
+    // Alias untuk noRMPasien agar kompatibel dengan DB layer
+    public String getNoRM() {
+        return noRMPasien;
+    }
+
+    public void setNoRM(String noRM) {
+        this.noRMPasien = noRM;
+    }
+
     // ========== TO STRING ==========
 
     public String toString() {
-        return idAdmisi + " [" + status + "]";
+        StringBuffer sb = new StringBuffer();
+        sb.append(idAdmisi).append(" [").append(status).append("]");
+        return sb.toString();
     }
 }

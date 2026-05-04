@@ -54,6 +54,17 @@ public class IDGenerator {
     }
 
     /**
+     * Generate Nomor RM Pasien: RM-YYYYMMDD-XXX
+     */
+    public static String generateNoRM() {
+        int counter = ambilDanNaikkanCounter("norm");
+        String tanggal = DateUtil.formatTanggalKompak(DateUtil.sekarang());
+        return new StringBuffer()
+            .append("RM-").append(tanggal).append("-")
+            .append(padTigaDigit(counter)).toString();
+    }
+
+    /**
      * Generate ID User: USR-XXXX
      */
     public static String generateUserId() {
@@ -110,5 +121,14 @@ public class IDGenerator {
         if (angka < 100) return new StringBuffer().append("00").append(angka).toString();
         if (angka < 1000) return new StringBuffer().append("0").append(angka).toString();
         return String.valueOf(angka);
+    }
+
+    /**
+     * Padding angka menjadi 3 digit.
+     */
+    private static String padTigaDigit(int n) {
+        if (n < 10) return new StringBuffer().append("00").append(n).toString();
+        if (n < 100) return new StringBuffer().append("0").append(n).toString();
+        return String.valueOf(n);
     }
 }

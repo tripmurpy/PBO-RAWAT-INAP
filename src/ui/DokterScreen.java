@@ -2,8 +2,9 @@ package ui;
 
 import javax.microedition.lcdui.*;
 import java.util.Vector;
-import controller.DokterController;
+import service.DokterService;
 import model.Dokter;
+import util.ServiceFactory;
 
 /**
  * DokterScreen — List & form manajemen dokter.
@@ -12,14 +13,14 @@ import model.Dokter;
  */
 public class DokterScreen extends Form implements CommandListener {
 
-    private DokterController controller;
+    private DokterService dokterService;
     private TextField tfNama, tfSpesialisasi, tfJadwal, tfHapusId;
     private Command cmdTambah, cmdKembali, cmdHapus;
     private StringItem siInfo;
 
     public DokterScreen() {
         super("MANAJEMEN DOKTER");
-        this.controller = new DokterController();
+        this.dokterService = ServiceFactory.getInstance().getDokterService();
 
         siInfo = new StringItem("", "");
         muatDaftarDokter();
@@ -27,14 +28,14 @@ public class DokterScreen extends Form implements CommandListener {
         tfNama = new TextField("Nama Dokter", "", 100, TextField.ANY);
         tfSpesialisasi = new TextField("Spesialisasi", "", 50, TextField.ANY);
         tfJadwal = new TextField("Jadwal Praktik", "", 50, TextField.ANY);
-        
+
         append(siInfo);
         append(new Spacer(10, 10));
         append(new StringItem("", "--- Tambah Dokter Baru ---"));
         append(tfNama);
         append(tfSpesialisasi);
         append(tfJadwal);
-        
+
         append(new Spacer(10, 10));
         append(new StringItem("", "--- Hapus Dokter ---"));
         tfHapusId = new TextField("ID Dokter (contoh: DKT-0001)", "", 20, TextField.ANY);
@@ -43,7 +44,7 @@ public class DokterScreen extends Form implements CommandListener {
         cmdTambah = new Command("Tambah", Command.OK, 1);
         cmdHapus = new Command("Hapus", Command.ITEM, 2);
         cmdKembali = new Command("Kembali", Command.BACK, 3);
-        
+
         addCommand(cmdTambah);
         addCommand(cmdHapus);
         addCommand(cmdKembali);
@@ -52,7 +53,7 @@ public class DokterScreen extends Form implements CommandListener {
 
     private void muatDaftarDokter() {
         try {
-            Vector list = controller.getSemuaDokter();
+            Vector list = dokterService.getSemuaDokter();
             if (list.size() == 0) {
                 siInfo.setText("Belum ada data dokter.");
             } else {
@@ -76,21 +77,22 @@ public class DokterScreen extends Form implements CommandListener {
             ScreenManager.getInstance().kembali();
         } else if (c == cmdTambah) {
             try {
-                Dokter dokter = controller.tambahDokter(
-                    tfNama.getString(), tfSpesialisasi.getString(), 
-                    tfJadwal.getString());
+                Dokter dokter = dokterService.tambahDokter(
+                        tfNama.getString(), tfSpesialisasi.getString(),
+                        tfJadwal.getString());
 
                 Alert alert = new Alert("BERHASIL",
-                    new StringBuffer().append("Dokter berhasil ditambahkan!\nID: ").append(dokter.getId()).toString(),
-                    null, AlertType.CONFIRMATION);
+                        new StringBuffer().append("Dokter berhasil ditambahkan!\nID: ").append(dokter.getId())
+                                .toString(),
+                        null, AlertType.CONFIRMATION);
                 alert.setTimeout(3000);
-                
+
                 // Refresh list
                 muatDaftarDokter();
                 tfNama.setString("");
                 tfSpesialisasi.setString("");
                 tfJadwal.setString("");
-                
+
                 ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
             } catch (Exception e) {
                 Alert alert = new Alert("ERROR", e.getMessage(), null, AlertType.ERROR);
@@ -107,7 +109,7 @@ public class DokterScreen extends Form implements CommandListener {
             }
             // Cari dokter berdasarkan String ID (DKT-XXXX)
             try {
-                java.util.Vector list = controller.getSemuaDokter();
+                java.util.Vector list = dokterService.getSemuaDokter();
                 model.Dokter target = null;
                 for (int i = 0; i < list.size(); i++) {
                     model.Dokter dk = (model.Dokter) list.elementAt(i);
@@ -117,18 +119,22 @@ public class DokterScreen extends Form implements CommandListener {
                     }
                 }
                 if (target == null) {
-                    throw new Exception(new StringBuffer().append("Dokter dengan ID ").append(idStr).append(" tidak ditemukan").toString());
+                    throw new Exception(new StringBuffer().append("Dokter dengan ID ").append(idStr)
+                            .append(" tidak ditemukan").toString());
                 }
-                controller.hapusDokter(target.getRecordId());
-                
-                Alert alert = new Alert("BERHASIL", new StringBuffer().append("Dokter ").append(target.getNama()).append(" berhasil dihapus").toString(), null, AlertType.CONFIRMATION);
+                dokterService.hapusDokter(target.getRecordId());
+
+                Alert alert = new Alert("BERHASIL", new StringBuffer().append("Dokter ").append(target.getNama())
+                        .append(" berhasil dihapus").toString(), null, AlertType.CONFIRMATION);
                 alert.setTimeout(3000);
-                
+
                 muatDaftarDokter();
                 tfHapusId.setString("");
                 ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
             } catch (Exception e) {
-                Alert alert = new Alert("ERROR", new StringBuffer().append("Gagal hapus: ").append(e.getMessage()).toString(), null, AlertType.ERROR);
+                Alert alert = new Alert("ERROR",
+                        new StringBuffer().append("Gagal hapus: ").append(e.getMessage()).toString(), null,
+                        AlertType.ERROR);
                 alert.setTimeout(3000);
                 ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
             }

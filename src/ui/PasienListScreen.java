@@ -1,17 +1,11 @@
 package ui;
 
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Font;
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.*;
 import java.util.Vector;
-import controller.PasienController;
 import model.Pasien;
 import util.DateUtil;
+import service.PasienService;
+import util.ServiceFactory;
 
 /**
  * PasienListScreen — Menampilkan daftar semua pasien.
@@ -19,7 +13,7 @@ import util.DateUtil;
  */
 public class PasienListScreen extends Canvas implements CommandListener {
 
-    private PasienController controller;
+    private PasienService service;
     private Vector daftarPasien;
     private int selectedIndex = 0;
     private int scrollOffset = 0;
@@ -36,7 +30,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
     private static final int WARNA_HAPUS = 0xE94560;
 
     public PasienListScreen() {
-        this.controller = new PasienController();
+        this.service = ServiceFactory.getInstance().getPasienService();
         setFullScreenMode(true);
         muatData();
         
@@ -49,7 +43,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
 
     private void muatData() {
         try {
-            daftarPasien = controller.getSemuaPasien();
+            daftarPasien = service.getSemuaPasien();
         } catch (Exception e) {
             daftarPasien = new Vector();
             pesanError = new StringBuffer().append("Gagal memuat data: ").append(e.getMessage()).toString();
@@ -214,7 +208,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
             public void commandAction(Command c, Displayable d) {
                 if (c == cmdYa) {
                     try {
-                        controller.hapusPasien(p.getRecordId());
+                        service.hapusPasien(p.getRecordId());
                         muatData();
                         repaint();
                         ScreenManager.getInstance().getDisplay().setCurrent(PasienListScreen.this);
@@ -230,3 +224,4 @@ public class PasienListScreen extends Canvas implements CommandListener {
         ScreenManager.getInstance().getDisplay().setCurrent(alert);
     }
 }
+

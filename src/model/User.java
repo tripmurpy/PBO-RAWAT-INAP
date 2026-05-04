@@ -47,13 +47,29 @@ public class User {
      * J2ME tidak punya MessageDigest standar, gunakan hash custom.
      */
     public static String hashPassword(String password) {
-        int hash = 7;
-        for (int i = 0; i < password.length(); i++) {
-            hash = hash * 31 + password.charAt(i);
+        // Gabungkan password + salt statis + iterasi
+        StringBuffer sbSalted = new StringBuffer();
+        sbSalted.append("RSI_SALT_v1_").append(password).append("_").append(password.length());
+        String salted = sbSalted.toString();
+        
+        int hash1 = 17;
+        int hash2 = 31;
+        for (int i = 0; i < salted.length(); i++) {
+            char c = salted.charAt(i);
+            hash1 = hash1 * 37 + c;
+            hash2 = hash2 * 53 + (c ^ (i + 7));
         }
-        // Konversi ke hex string
-        String hex = Integer.toHexString(hash & 0x7FFFFFFF);
-        return "H" + hex;
+        // Iterasi stretching (1000x)
+        for (int round = 0; round < 1000; round++) {
+            hash1 = hash1 * 31 ^ hash2;
+            hash2 = hash2 * 37 ^ hash1;
+        }
+        
+        StringBuffer res = new StringBuffer();
+        res.append("S2$");
+        res.append(Integer.toString(hash1, 16));
+        res.append(Integer.toString(hash2, 16));
+        return res.toString();
     }
 
     /**
@@ -64,6 +80,8 @@ public class User {
     }
 
     public String toString() {
-        return username + " (" + role + ")";
+        StringBuffer sb = new StringBuffer();
+        sb.append(username).append(" (").append(role).append(")");
+        return sb.toString();
     }
 }

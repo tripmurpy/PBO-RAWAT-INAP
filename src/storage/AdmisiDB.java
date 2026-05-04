@@ -1,136 +1,91 @@
 package storage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.util.Vector;
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordStore;
 import model.Admisi;
 import model.repository.IAdmisiRepository;
 import util.RMSUtil;
 
 /**
  * AdmisiDB — Implementasi IAdmisiRepository menggunakan RMS.
- * POLYMORPHISM: implements IAdmisiRepository.
  */
-public class AdmisiDB implements IAdmisiRepository {
+public class AdmisiDB extends BaseDB implements IAdmisiRepository {
 
-    private static final String STORE_NAME = "admisi_store";
+    protected String getStoreName() { return "admisi_store"; }
 
-    public void save(Admisi admisi) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            byte[] data = serialize(admisi);
-            int rid = RMSUtil.simpanRecord(rs, data);
-            admisi.setRecordId(rid);
-        } finally { RMSUtil.tutupStore(rs); }
-    }
+    protected String getEntityId(Object e) { return ((Admisi) e).getIdAdmisi(); }
 
-    public Admisi findById(String idAdmisi) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                Admisi a = deserialize(rs.getRecord(rid));
-                a.setRecordId(rid);
-                if (idAdmisi.equals(a.getIdAdmisi())) return a;
-            }
-        } finally { RMSUtil.tutupStore(rs); }
-        return null;
+    protected void setRecordId(Object e, int rid) { ((Admisi) e).setRecordId(rid); }
+
+    public void save(Admisi a) throws Exception { saveEntity(a); }
+
+    public Admisi findById(String id) throws Exception {
+        return (Admisi) findByStringId(id);
     }
 
     public Vector findByPasien(String noRM) throws Exception {
-        Vector hasil = new Vector();
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                Admisi a = deserialize(rs.getRecord(rid));
-                a.setRecordId(rid);
-                if (noRM.equals(a.getNoRMPasien())) hasil.addElement(a);
+        Vector result = new Vector();
+        Vector all = getAllEntities();
+        for (int i = 0; i < all.size(); i++) {
+            Admisi a = (Admisi) all.elementAt(i);
+            if (a.getNoRM().equals(noRM)) {
+                result.addElement(a);
             }
-        } finally { RMSUtil.tutupStore(rs); }
-        return hasil;
+        }
+        return result;
     }
 
     public Vector findAktif() throws Exception {
-        Vector hasil = new Vector();
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                Admisi a = deserialize(rs.getRecord(rid));
-                a.setRecordId(rid);
-                if (a.isAktif()) hasil.addElement(a);
+        Vector result = new Vector();
+        Vector all = getAllEntities();
+        for (int i = 0; i < all.size(); i++) {
+            Admisi a = (Admisi) all.elementAt(i);
+            if (a.getStatus().equals("AKTIF")) {
+                result.addElement(a);
             }
-        } finally { RMSUtil.tutupStore(rs); }
-        return hasil;
+        }
+        return result;
     }
 
-    public Vector getAll() throws Exception {
-        Vector hasil = new Vector();
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                Admisi a = deserialize(rs.getRecord(rid));
-                a.setRecordId(rid);
-                hasil.addElement(a);
-            }
-        } finally { RMSUtil.tutupStore(rs); }
-        return hasil;
+    public Vector getAll() throws Exception { return getAllEntities(); }
+
+    public void update(Admisi a) throws Exception {
+        updateEntity(a, a.getRecordId());
     }
 
-    public void update(Admisi admisi) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RMSUtil.updateRecord(rs, admisi.getRecordId(), serialize(admisi));
-        } finally { RMSUtil.tutupStore(rs); }
+    protected int getRecordIdFromObject(Object e) {
+        return ((Admisi) e).getRecordId();
     }
 
-    private byte[] serialize(Admisi a) throws Exception {
+    protected byte[] serialize(Object obj) throws Exception {
+        Admisi a = (Admisi) obj;
         Object[] s = RMSUtil.buatOutputStream();
-        DataOutputStream dos = (DataOutputStream) s[1];
+        java.io.DataOutputStream dos = (java.io.DataOutputStream) s[1];
         dos.writeUTF(a.getIdAdmisi());
-        dos.writeUTF(a.getNoRMPasien());
+        dos.writeUTF(a.getNoRM());
         dos.writeUTF(a.getIdDokter());
         dos.writeUTF(a.getIdRuangan());
-        dos.writeLong(a.getTglMasuk());
-        dos.writeLong(a.getTglKeluar());
         dos.writeUTF(a.getDiagnosisAwal());
-        dos.writeUTF(a.getDiagnosisAkhir() != null ? a.getDiagnosisAkhir() : "");
-        dos.writeUTF(a.getKodeICD10() != null ? a.getKodeICD10() : "");
-        dos.writeUTF(a.getCatatan() != null ? a.getCatatan() : "");
+        dos.writeLong(a.getTglMasuk());
         dos.writeUTF(a.getStatus());
+        dos.writeLong(a.getTglKeluar());
+        dos.writeInt(a.getBiayaTotal());
         byte[] result = RMSUtil.ambilBytes(s);
         dos.close();
         return result;
     }
 
-    private Admisi deserialize(byte[] data) throws Exception {
-        DataInputStream dis = RMSUtil.buatInputStream(data);
+    protected Object deserialize(byte[] data) throws Exception {
+        java.io.DataInputStream dis = RMSUtil.buatInputStream(data);
         Admisi a = new Admisi();
         a.setIdAdmisi(dis.readUTF());
-        a.setNoRMPasien(dis.readUTF());
+        a.setNoRM(dis.readUTF());
         a.setIdDokter(dis.readUTF());
         a.setIdRuangan(dis.readUTF());
-        a.setTglMasuk(dis.readLong());
-        a.setTglKeluar(dis.readLong());
         a.setDiagnosisAwal(dis.readUTF());
-        a.setDiagnosisAkhir(dis.readUTF());
-        a.setKodeICD10(dis.readUTF());
-        a.setCatatan(dis.readUTF());
+        a.setTglMasuk(dis.readLong());
         a.setStatus(dis.readUTF());
+        a.setTglKeluar(dis.readLong());
+        a.setBiayaTotal(dis.readInt());
         dis.close();
         return a;
     }

@@ -2,8 +2,8 @@ package service;
 
 import java.util.Vector;
 import model.Pasien;
-import storage.PasienDB;
-import util.NoRMGenerator;
+import model.repository.IPasienRepository;
+import util.IDGenerator;
 import util.Validator;
 
 /**
@@ -12,10 +12,10 @@ import util.Validator;
  */
 public class PasienService {
 
-    private PasienDB pasienDB;
+    private IPasienRepository pasienRepo;
 
-    public PasienService() {
-        this.pasienDB = new PasienDB();
+    public PasienService(IPasienRepository pasienRepo) {
+        this.pasienRepo = pasienRepo;
     }
 
     /**
@@ -23,7 +23,7 @@ public class PasienService {
      * Validasi → Generate No.RM → Simpan ke RMS.
      * @return Pasien yang berhasil didaftarkan (dengan No.RM)
      */
-    public Pasien daftarBaru(String nama, String tglLahirStr,
+    public Pasien daftarPasienBaru(String nama, String tglLahirStr,
             String jenisKelamin, String alamat, 
             String noTelp, String asuransi) throws Exception {
 
@@ -38,7 +38,7 @@ public class PasienService {
         long tglLahir = util.DateUtil.parseTanggal(tglLahirStr);
 
         // Generate No. RM
-        String noRM = NoRMGenerator.generate();
+        String noRM = IDGenerator.generateNoRM();
 
         // Buat objek pasien
         Pasien pasien = new Pasien(noRM, nama.trim(), tglLahir,
@@ -46,13 +46,13 @@ public class PasienService {
                                     noTelp.trim(), asuransi);
 
         // Simpan
-        pasienDB.save(pasien);
+        pasienRepo.save(pasien);
         return pasien;
     }
 
     /** Mencari pasien berdasarkan No. RM */
     public Pasien cariByRM(String noRM) throws Exception {
-        Pasien p = pasienDB.findByRM(noRM);
+        Pasien p = pasienRepo.findByRM(noRM);
         if (p == null) {
             throw new Exception("Pasien tidak ditemukan");
         }
@@ -61,21 +61,21 @@ public class PasienService {
 
     /** Mencari pasien berdasarkan nama */
     public Vector cariByNama(String keyword) throws Exception {
-        return pasienDB.cariByNama(keyword);
+        return pasienRepo.cariByNama(keyword);
     }
 
     /** Mendapatkan semua data pasien */
     public Vector getSemuaPasien() throws Exception {
-        return pasienDB.getAll();
+        return pasienRepo.getAll();
     }
 
     /** Memperbarui data pasien */
     public void updatePasien(Pasien pasien) throws Exception {
-        pasienDB.update(pasien);
+        pasienRepo.update(pasien);
     }
 
     /** Menghapus data pasien */
     public void hapusPasien(int recordId) throws Exception {
-        pasienDB.delete(recordId);
+        pasienRepo.delete(recordId);
     }
 }

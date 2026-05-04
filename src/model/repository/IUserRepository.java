@@ -12,4 +12,5 @@ public interface IUserRepository {
     User findByUsername(String username) throws Exception;
     boolean verify(String username, String password) throws Exception;
     boolean adaDataUser() throws Exception;
+    void inisialisasiDefault() throws Exception;
 }

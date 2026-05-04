@@ -4,8 +4,9 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Displayable;
-import controller.AuthController;
+import service.AuthService;
 import model.User;
+import util.ServiceFactory;
 
 /**
  * LoginScreen — Layar login admin.
@@ -15,12 +16,18 @@ import model.User;
  */
 public class LoginScreen extends Canvas {
 
-    private AuthController authController;
+    private AuthService authService;
     private String username = "";
     private String password = "";
     private int fieldAktif = 0; // 0=username, 1=password, 2=login button
     private String pesanError = "";
     private boolean sedangInput = false;
+
+    // Layout coordinates - calculated in paint(), used in pointerPressed()
+    private int cardX, cardY, cardW, cardH;
+    private int fieldX, fieldW, fieldH;
+    private int usernameFieldY, passwordFieldY;
+    private int btnY, btnH;
 
     // Konstanta warna
     private static final int WARNA_BG = 0x1A1A2E;
@@ -35,7 +42,7 @@ public class LoginScreen extends Canvas {
     private static final int WARNA_SELECTED = 0x0F3460;
 
     public LoginScreen() {
-        this.authController = new AuthController();
+        this.authService = ServiceFactory.getInstance().getAuthService();
         setFullScreenMode(true);
     }
 
@@ -66,16 +73,17 @@ public class LoginScreen extends Canvas {
         y += fontKecil.getHeight() + 20;
 
         // Card login
-        int cardX = 10;
-        int cardW = w - 20;
-        int cardH = 160;
+        this.cardX = 10;
+        this.cardW = w - 20;
+        this.cardH = 160;
+        this.cardY = y;
         g.setColor(WARNA_CARD);
-        g.fillRoundRect(cardX, y, cardW, cardH, 12, 12);
+        g.fillRoundRect(cardX, cardY, cardW, cardH, 12, 12);
 
-        int fieldX = cardX + 10;
-        int fieldW = cardW - 20;
-        int fieldH = 28;
-        int fy = y + 15;
+        this.fieldX = cardX + 10;
+        this.fieldW = cardW - 20;
+        this.fieldH = 28;
+        int fy = cardY + 15;
 
         g.setFont(fontKecil);
 
@@ -83,14 +91,15 @@ public class LoginScreen extends Canvas {
         g.setColor(WARNA_TEKS_REDUP);
         g.drawString("Username", fieldX, fy, Graphics.TOP | Graphics.LEFT);
         fy += fontKecil.getHeight() + 2;
+        this.usernameFieldY = fy;
 
         // Field username
         g.setColor(fieldAktif == 0 ? WARNA_FIELD_AKTIF : WARNA_FIELD_BG);
-        g.fillRoundRect(fieldX, fy, fieldW, fieldH, 6, 6);
+        g.fillRoundRect(fieldX, usernameFieldY, fieldW, fieldH, 6, 6);
         g.setColor(WARNA_TEKS);
         g.setFont(fontSedang);
-        g.drawString(username.length() > 0 ? username : "", 
-                     fieldX + 8, fy + 4, Graphics.TOP | Graphics.LEFT);
+        g.drawString(username.length() > 0 ? username : "",
+                fieldX + 8, usernameFieldY + 4, Graphics.TOP | Graphics.LEFT);
         fy += fieldH + 10;
 
         // Label password
@@ -98,30 +107,32 @@ public class LoginScreen extends Canvas {
         g.setFont(fontKecil);
         g.drawString("Password", fieldX, fy, Graphics.TOP | Graphics.LEFT);
         fy += fontKecil.getHeight() + 2;
+        this.passwordFieldY = fy;
 
         // Field password
         g.setColor(fieldAktif == 1 ? WARNA_FIELD_AKTIF : WARNA_FIELD_BG);
-        g.fillRoundRect(fieldX, fy, fieldW, fieldH, 6, 6);
+        g.fillRoundRect(fieldX, passwordFieldY, fieldW, fieldH, 6, 6);
         g.setColor(WARNA_TEKS);
         g.setFont(fontSedang);
         // Tampilkan password sebagai ****
         String mask = "";
-        for (int i = 0; i < password.length(); i++) mask += "*";
-        g.drawString(mask, fieldX + 8, fy + 4, Graphics.TOP | Graphics.LEFT);
+        for (int i = 0; i < password.length(); i++)
+            mask += "*";
+        g.drawString(mask, fieldX + 8, passwordFieldY + 4, Graphics.TOP | Graphics.LEFT);
         fy += fieldH + 15;
 
         // Tombol LOGIN
-        int btnY = y + cardH + 15;
-        int btnH = 35;
+        this.btnY = cardY + cardH + 15;
+        this.btnH = 35;
         g.setColor(fieldAktif == 2 ? WARNA_SELECTED : WARNA_TOMBOL);
         g.fillRoundRect(fieldX, btnY, fieldW, btnH, 8, 8);
-        
+
         // Border if selected
         if (fieldAktif == 2) {
             g.setColor(WARNA_TEKS);
             g.drawRoundRect(fieldX, btnY, fieldW, btnH, 8, 8);
         }
-        
+
         g.setColor(WARNA_TEKS);
         g.setFont(fontBesar);
         g.drawString("LOGIN", centerX, btnY + 6, Graphics.TOP | Graphics.HCENTER);
@@ -130,15 +141,9 @@ public class LoginScreen extends Canvas {
         if (pesanError.length() > 0) {
             g.setColor(WARNA_ERROR);
             g.setFont(fontKecil);
-            g.drawString(pesanError, centerX, btnY + btnH + 10, 
-                         Graphics.TOP | Graphics.HCENTER);
+            g.drawString(pesanError, centerX, btnY + btnH + 10,
+                    Graphics.TOP | Graphics.HCENTER);
         }
-
-        // Info default
-        g.setColor(WARNA_TEKS_REDUP);
-        g.setFont(fontKecil);
-        g.drawString("Default: admin / admin123", centerX, h - 20, 
-                     Graphics.TOP | Graphics.HCENTER);
     }
 
     protected void keyPressed(int keyCode) {
@@ -180,33 +185,20 @@ public class LoginScreen extends Canvas {
     }
 
     protected void pointerPressed(int x, int y) {
-        int w = getWidth();
-        int h = getHeight();
-        int cardY = h / 8 + Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, 
-                    Font.SIZE_LARGE).getHeight() + 4 +
-                    Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, 
-                    Font.SIZE_SMALL).getHeight() + 20;
-        int btnY = cardY + 160 + 15;
-        int btnH = 35;
-        int fieldX = 20;
-        int fieldW = w - 40;
-
+        // Gunakan field yang sudah dihitung paint()
         // Cek klik tombol LOGIN
         if (x >= fieldX && x <= fieldX + fieldW && y >= btnY && y <= btnY + btnH) {
+            fieldAktif = 2;
             prosesLogin();
         }
 
         // Cek klik field username
-        int fy = cardY + 15 + Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, 
-                 Font.SIZE_SMALL).getHeight() + 2;
-        if (y >= fy && y <= fy + 28) {
+        if (x >= fieldX && x <= fieldX + fieldW && y >= usernameFieldY && y <= usernameFieldY + fieldH) {
             fieldAktif = 0;
         }
 
         // Cek klik field password
-        fy += 28 + 10 + Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, 
-             Font.SIZE_SMALL).getHeight() + 2;
-        if (y >= fy && y <= fy + 28) {
+        if (x >= fieldX && x <= fieldX + fieldW && y >= passwordFieldY && y <= passwordFieldY + fieldH) {
             fieldAktif = 1;
         }
         repaint();
@@ -214,7 +206,7 @@ public class LoginScreen extends Canvas {
 
     private void prosesLogin() {
         try {
-            User user = authController.login(username, password);
+            User user = authService.login(username, password);
             pesanError = "";
             // Navigasi ke Dashboard
             ScreenManager.getInstance().tampilkanLayar(new DashboardScreen(user));
@@ -231,14 +223,22 @@ public class LoginScreen extends Canvas {
         }
         // Huruf sederhana via multi-tap (simplified)
         switch (keyCode) {
-            case Canvas.KEY_NUM2: return 'a';
-            case Canvas.KEY_NUM3: return 'd';
-            case Canvas.KEY_NUM4: return 'g';
-            case Canvas.KEY_NUM5: return 'j';
-            case Canvas.KEY_NUM6: return 'm';
-            case Canvas.KEY_NUM7: return 'p';
-            case Canvas.KEY_NUM8: return 't';
-            case Canvas.KEY_NUM9: return 'w';
+            case Canvas.KEY_NUM2:
+                return 'a';
+            case Canvas.KEY_NUM3:
+                return 'd';
+            case Canvas.KEY_NUM4:
+                return 'g';
+            case Canvas.KEY_NUM5:
+                return 'j';
+            case Canvas.KEY_NUM6:
+                return 'm';
+            case Canvas.KEY_NUM7:
+                return 'p';
+            case Canvas.KEY_NUM8:
+                return 't';
+            case Canvas.KEY_NUM9:
+                return 'w';
         }
         return 0;
     }

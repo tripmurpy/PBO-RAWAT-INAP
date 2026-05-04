@@ -1,9 +1,13 @@
 package ui;
+/*
+ * Copyright (c) 2026 tripmurpy/PBO-RAWAT-INAP
+ */
 
 import javax.microedition.lcdui.*;
 import java.util.Vector;
-import controller.RuanganController;
+import service.RuanganService;
 import model.Ruangan;
+import util.ServiceFactory;
 
 /**
  * RuanganScreen — Status kamar & manajemen ruangan.
@@ -12,7 +16,7 @@ import model.Ruangan;
  */
 public class RuanganScreen extends Form implements CommandListener {
 
-    private RuanganController controller;
+    private RuanganService service;
     private StringItem siStatus;
     private TextField tfNama;
     private ChoiceGroup cgTipe;
@@ -21,14 +25,13 @@ public class RuanganScreen extends Form implements CommandListener {
 
     public RuanganScreen() {
         super("MANAJEMEN KAMAR");
-        this.controller = new RuanganController();
+        this.service = ServiceFactory.getInstance().getRuanganService();
 
         siStatus = new StringItem("", "");
         muatStatusKamar();
 
         append(siStatus);
-        append(new Spacer(getWidth(), 10));
-        append(new StringItem("", "--- Tambah Kamar Baru ---"));
+        append(new StringItem("", "\n--- Tambah Kamar Baru ---"));
 
         tfNama = new TextField("Nama/Nomor Kamar", "", 20, TextField.ANY);
         cgTipe = new ChoiceGroup("Tipe Kamar", ChoiceGroup.EXCLUSIVE);
@@ -53,8 +56,8 @@ public class RuanganScreen extends Form implements CommandListener {
 
     private void muatStatusKamar() {
         try {
-            Vector list = controller.getSemuaRuangan();
-            int[] stat = controller.hitungStatistik();
+            Vector list = service.getSemuaRuangan();
+            int[] stat = service.hitungStatistik();
             StringBuffer sb = new StringBuffer();
             sb.append("=== STATUS KAMAR ===\n\n");
 
@@ -87,7 +90,7 @@ public class RuanganScreen extends Form implements CommandListener {
                 String tipe = tipeArr[cgTipe.getSelectedIndex()];
                 int kap = Integer.parseInt(tfKapasitas.getString());
 
-                Ruangan r = controller.tambahRuangan(tfNama.getString(), tipe, kap);
+                Ruangan r = service.tambahRuangan(tfNama.getString(), tipe, kap);
 
                 Alert alert = new Alert("BERHASIL",
                     new StringBuffer().append("Kamar berhasil ditambahkan!\n").append(r.getNamaRuangan())
@@ -108,3 +111,4 @@ public class RuanganScreen extends Form implements CommandListener {
         }
     }
 }
+

@@ -21,18 +21,20 @@ public class Ruangan {
 
     // ========== FIELD PRIVATE (ENCAPSULATION) ==========
     private int recordId;
-    private String id;            // ID Ruangan (RNG-XXXX)
-    private String namaRuangan;   // Nama/nomor kamar (VIP-01, Kls1-02)
-    private String tipeKamar;     // Tipe (VIP, Kelas I, Kelas II, dll)
-    private int kapasitas;        // Kapasitas tempat tidur
-    private String statusKamar;   // KOSONG / TERISI / MAINTENANCE
-    private String namaPasien;    // Nama pasien jika TERISI (opsional)
+    private String id; // ID Ruangan (RNG-XXXX)
+    private String namaRuangan; // Nama/nomor kamar (VIP-01, Kls1-02)
+    private String tipeKamar; // Tipe (VIP, Kelas I, Kelas II, dll)
+    private int kapasitas; // Kapasitas tempat tidur
+    private String statusKamar; // KOSONG / TERISI / MAINTENANCE
+    private String namaPasien; // Nama pasien jika TERISI (opsional)
+    private String noRM; // No. RM pasien jika TERISI
 
     // ========== KONSTRUKTOR ==========
 
     public Ruangan() {
         this.statusKamar = STATUS_KOSONG;
         this.namaPasien = "";
+        this.noRM = "";
     }
 
     public Ruangan(String id, String namaRuangan, String tipeKamar, int kapasitas) {
@@ -42,6 +44,7 @@ public class Ruangan {
         this.kapasitas = kapasitas;
         this.statusKamar = STATUS_KOSONG;
         this.namaPasien = "";
+        this.noRM = "";
     }
 
     // ========== GETTER (ENCAPSULATION) ==========
@@ -116,6 +119,22 @@ public class Ruangan {
 
     public void setNamaPasien(String namaPasien) {
         this.namaPasien = namaPasien;
+    }
+
+    public String getNoRM() {
+        return noRM;
+    }
+
+    public void setNoRM(String noRM) {
+        this.noRM = noRM;
+    }
+
+    public void setKosong(boolean kosong) {
+        if (kosong) {
+            this.statusKamar = STATUS_KOSONG;
+            this.noRM = "";
+            this.namaPasien = "";
+        }
     }
 
     // ========== TO STRING ==========

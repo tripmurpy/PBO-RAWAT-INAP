@@ -9,11 +9,11 @@ public class Dokter {
 
     // ========== FIELD PRIVATE (ENCAPSULATION) ==========
     private int recordId;
-    private String id;            // ID Dokter (DKT-XXXX)
-    private String nama;          // Nama lengkap dokter
-    private String spesialisasi;  // Spesialisasi (Sp.PD, Sp.A, dll)
-    private String jadwal;        // Jadwal praktik (Senin-Jumat)
-    private boolean aktif;        // Status aktif/tidak
+    private String id; // ID Dokter (DKT-XXXX)
+    private String nama; // Nama lengkap dokter
+    private String spesialisasi; // Spesialisasi (Sp.PD, Sp.A, dll)
+    private String jadwal; // Jadwal praktik (Senin-Jumat)
+    private boolean aktif; // Status aktif/tidak
 
     // ========== KONSTRUKTOR ==========
 

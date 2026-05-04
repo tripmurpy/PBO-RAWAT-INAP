@@ -2,15 +2,16 @@ package ui;
 
 import javax.microedition.lcdui.*;
 import java.util.Vector;
-import controller.AdmisiController;
-import controller.PasienController;
-import controller.DokterController;
-import controller.RuanganController;
+import service.AdmisiService;
+import service.PasienService;
+import service.DokterService;
+import service.RuanganService;
 import model.Pasien;
 import model.Dokter;
 import model.Ruangan;
 import model.Admisi;
 import util.DateUtil;
+import util.ServiceFactory;
 
 /**
  * AdmisiScreen — Form rawat inap baru.
@@ -18,10 +19,10 @@ import util.DateUtil;
  */
 public class AdmisiScreen extends Form implements CommandListener {
 
-    private AdmisiController admisiController;
-    private PasienController pasienController;
-    private DokterController dokterController;
-    private RuanganController ruanganController;
+    private AdmisiService admisiService;
+    private PasienService pasienService;
+    private DokterService dokterService;
+    private RuanganService ruanganService;
 
     private TextField tfNoRM, tfDiagnosis, tfTglMasuk;
     private ChoiceGroup cgDokter, cgRuangan;
@@ -33,10 +34,11 @@ public class AdmisiScreen extends Form implements CommandListener {
 
     public AdmisiScreen() {
         super("RAWAT INAP BARU");
-        this.admisiController = new AdmisiController();
-        this.pasienController = new PasienController();
-        this.dokterController = new DokterController();
-        this.ruanganController = new RuanganController();
+        ServiceFactory sf = ServiceFactory.getInstance();
+        this.admisiService = sf.getAdmisiService();
+        this.pasienService = sf.getPasienService();
+        this.dokterService = sf.getDokterService();
+        this.ruanganService = sf.getRuanganService();
 
         tfNoRM = new TextField("No. RM Pasien", "", 20, TextField.ANY);
         siPasienInfo = new StringItem("Info Pasien", "Belum dicari");
@@ -64,7 +66,7 @@ public class AdmisiScreen extends Form implements CommandListener {
 
     private void cariPasien() {
         try {
-            pasienDitemukan = pasienController.cariByRM(tfNoRM.getString().trim());
+            pasienDitemukan = pasienService.cariByRM(tfNoRM.getString().trim());
             StringBuffer sb = new StringBuffer();
             sb.append("Nama    : ").append(pasienDitemukan.getNama()).append("\n");
             sb.append("Tgl Lhr : ").append(DateUtil.formatTanggal(pasienDitemukan.getTglLahir())).append("\n");
@@ -74,7 +76,7 @@ public class AdmisiScreen extends Form implements CommandListener {
             // Tampilkan form lengkap admisi
             tampilkanFormAdmisi();
         } catch (Exception e) {
-            siPasienInfo.setText("Error: " + e.getMessage());
+            siPasienInfo.setText(new StringBuffer().append("Error: ").append(e.getMessage()).toString());
         }
     }
 
@@ -82,18 +84,22 @@ public class AdmisiScreen extends Form implements CommandListener {
         try {
             // Dokter
             cgDokter = new ChoiceGroup("Dokter PJ", ChoiceGroup.EXCLUSIVE);
-            listDokter = dokterController.getSemuaDokter();
+            listDokter = dokterService.getSemuaDokter();
             for (int i = 0; i < listDokter.size(); i++) {
                 Dokter dk = (Dokter) listDokter.elementAt(i);
-                cgDokter.append(dk.getNama() + " (" + dk.getSpesialisasi() + ")", null);
+                StringBuffer sb = new StringBuffer();
+                sb.append(dk.getNama()).append(" (").append(dk.getSpesialisasi()).append(")");
+                cgDokter.append(sb.toString(), null);
             }
 
             // Ruangan tersedia
             cgRuangan = new ChoiceGroup("Kamar Tersedia", ChoiceGroup.EXCLUSIVE);
-            listRuangan = ruanganController.cariKamarTersedia(null);
+            listRuangan = ruanganService.cariKamarTersedia(null);
             for (int i = 0; i < listRuangan.size(); i++) {
                 Ruangan rn = (Ruangan) listRuangan.elementAt(i);
-                cgRuangan.append(rn.getNamaRuangan() + " (" + rn.getTipeKamar() + ")", null);
+                StringBuffer sb = new StringBuffer();
+                sb.append(rn.getNamaRuangan()).append(" (").append(rn.getTipeKamar()).append(")");
+                cgRuangan.append(sb.toString(), null);
             }
 
             tfDiagnosis = new TextField("Diagnosis Awal", "", 200, TextField.ANY);
@@ -126,7 +132,7 @@ public class AdmisiScreen extends Form implements CommandListener {
             Dokter dkPilih = (Dokter) listDokter.elementAt(cgDokter.getSelectedIndex());
             Ruangan rnPilih = (Ruangan) listRuangan.elementAt(cgRuangan.getSelectedIndex());
 
-            Admisi admisi = admisiController.buatAdmisi(
+            Admisi admisi = admisiService.buatAdmisi(
                 pasienDitemukan.getNoRM(),
                 dkPilih.getId(),
                 rnPilih.getId(),
@@ -134,11 +140,14 @@ public class AdmisiScreen extends Form implements CommandListener {
                 tfTglMasuk.getString()
             );
 
+            StringBuffer sb = new StringBuffer();
+            sb.append("ID Admisi : ").append(admisi.getIdAdmisi()).append("\n");
+            sb.append("Pasien    : ").append(pasienDitemukan.getNama()).append("\n");
+            sb.append("Kamar     : ").append(rnPilih.getNamaRuangan()).append("\n");
+            sb.append("Dokter    : ").append(dkPilih.getNama());
+
             Alert alert = new Alert("ADMISI BERHASIL",
-                "ID Admisi : " + admisi.getIdAdmisi() + "\n" +
-                "Pasien    : " + pasienDitemukan.getNama() + "\n" +
-                "Kamar     : " + rnPilih.getNamaRuangan() + "\n" +
-                "Dokter    : " + dkPilih.getNama(),
+                sb.toString(),
                 null, AlertType.CONFIRMATION);
             alert.setTimeout(Alert.FOREVER);
             Command cmdOK = new Command("OK", Command.OK, 1);

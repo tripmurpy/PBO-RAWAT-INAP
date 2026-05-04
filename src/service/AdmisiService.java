@@ -5,7 +5,7 @@ import model.Admisi;
 import model.Pasien;
 import model.Dokter;
 import model.Ruangan;
-import storage.AdmisiDB;
+import model.repository.IAdmisiRepository;
 import util.DateUtil;
 import util.IDGenerator;
 import util.Validator;
@@ -16,16 +16,19 @@ import util.Validator;
  */
 public class AdmisiService {
 
-    private AdmisiDB admisiDB;
+    private IAdmisiRepository admisiRepo;
     private PasienService pasienService;
     private DokterService dokterService;
     private RuanganService ruanganService;
 
-    public AdmisiService() {
-        this.admisiDB = new AdmisiDB();
-        this.pasienService = new PasienService();
-        this.dokterService = new DokterService();
-        this.ruanganService = new RuanganService();
+    public AdmisiService(IAdmisiRepository admisiRepo, 
+                        PasienService pasienService, 
+                        DokterService dokterService, 
+                        RuanganService ruanganService) {
+        this.admisiRepo = admisiRepo;
+        this.pasienService = pasienService;
+        this.dokterService = dokterService;
+        this.ruanganService = ruanganService;
     }
 
     /**
@@ -45,7 +48,7 @@ public class AdmisiService {
         Pasien pasien = pasienService.cariByRM(noRM);
 
         // Cek dokter ada
-        Dokter dokter = dokterService.cariById(idDokter);
+        dokterService.cariById(idDokter);
 
         // Cek ruangan tersedia
         Ruangan ruangan = ruanganService.cariById(idRuangan);
@@ -64,7 +67,7 @@ public class AdmisiService {
         // Buat admisi
         Admisi admisi = new Admisi(idAdmisi, noRM, idDokter, 
                                     idRuangan, tglMasuk, diagnosisAwal.trim());
-        admisiDB.save(admisi);
+        admisiRepo.save(admisi);
 
         // Update status kamar menjadi TERISI
         ruanganService.isiKamar(idRuangan, pasien.getNama());
@@ -84,7 +87,7 @@ public class AdmisiService {
         if (error != null) throw new Exception(error);
 
         // Cari admisi
-        Admisi admisi = admisiDB.findById(idAdmisi);
+        Admisi admisi = admisiRepo.findById(idAdmisi);
         if (admisi == null) throw new Exception("Admisi tidak ditemukan");
         if (!admisi.isAktif()) throw new Exception("Admisi sudah selesai");
 
@@ -97,7 +100,7 @@ public class AdmisiService {
         admisi.setKodeICD10(kodeICD10.trim());
         admisi.setCatatan(catatan != null ? catatan.trim() : "");
         admisi.setStatus(Admisi.STATUS_SELESAI);
-        admisiDB.update(admisi);
+        admisiRepo.update(admisi);
 
         // Kosongkan kamar
         ruanganService.kosongkanKamar(admisi.getIdRuangan());
@@ -107,7 +110,7 @@ public class AdmisiService {
 
     /** Cari admisi aktif berdasarkan No. RM */
     public Admisi cariAdmisiAktifByRM(String noRM) throws Exception {
-        Vector list = admisiDB.findByPasien(noRM);
+        Vector list = admisiRepo.findByPasien(noRM);
         for (int i = 0; i < list.size(); i++) {
             Admisi a = (Admisi) list.elementAt(i);
             if (a.isAktif()) return a;
@@ -117,12 +120,12 @@ public class AdmisiService {
 
     /** Mendapatkan semua admisi aktif */
     public Vector getAdmisiAktif() throws Exception {
-        return admisiDB.findAktif();
+        return admisiRepo.findAktif();
     }
 
     /** Mendapatkan semua admisi */
     public Vector getSemuaAdmisi() throws Exception {
-        return admisiDB.getAll();
+        return admisiRepo.getAll();
     }
 
     /** Menghitung lama rawat */

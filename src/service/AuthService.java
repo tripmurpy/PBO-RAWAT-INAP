@@ -1,21 +1,19 @@
 package service;
 
 import model.User;
-import storage.UserDB;
+import model.repository.IUserRepository;
 
 /**
  * AuthService — Logika bisnis autentikasi.
  * Memverifikasi kredensial dan mengelola sesi admin.
- * 
- * ENCAPSULATION: Detail autentikasi tersembunyi dari Controller.
  */
 public class AuthService {
 
-    private UserDB userDB;
+    private IUserRepository userRepo;
     private User currentUser; // Sesi user yang login
 
-    public AuthService() {
-        this.userDB = new UserDB();
+    public AuthService(IUserRepository userRepo) {
+        this.userRepo = userRepo;
         this.currentUser = null;
     }
 
@@ -24,10 +22,14 @@ public class AuthService {
      * @return User jika berhasil, null jika gagal
      */
     public User login(String username, String password) throws Exception {
-        // Inisialisasi akun default jika belum ada
-        userDB.inisialisasiDefault();
+        // Validasi input
+        String error = util.Validator.validasiLogin(username, password);
+        if (error != null) throw new Exception(error);
 
-        User user = userDB.findByUsername(username);
+        // Inisialisasi akun default jika belum ada
+        userRepo.inisialisasiDefault();
+
+        User user = userRepo.findByUsername(username);
         if (user == null) {
             throw new Exception("Akun tidak ditemukan");
         }

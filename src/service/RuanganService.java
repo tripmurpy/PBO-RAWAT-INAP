@@ -2,7 +2,7 @@ package service;
 
 import java.util.Vector;
 import model.Ruangan;
-import storage.RuanganDB;
+import model.repository.IRuanganRepository;
 import util.IDGenerator;
 import util.Validator;
 
@@ -11,10 +11,10 @@ import util.Validator;
  */
 public class RuanganService {
 
-    private RuanganDB ruanganDB;
+    private IRuanganRepository ruanganRepo;
 
-    public RuanganService() {
-        this.ruanganDB = new RuanganDB();
+    public RuanganService(IRuanganRepository ruanganRepo) {
+        this.ruanganRepo = ruanganRepo;
     }
 
     /** Menambah ruangan baru */
@@ -25,40 +25,40 @@ public class RuanganService {
 
         String id = IDGenerator.generateRuanganId();
         Ruangan ruangan = new Ruangan(id, namaRuangan.trim(), tipeKamar, kapasitas);
-        ruanganDB.save(ruangan);
+        ruanganRepo.save(ruangan);
         return ruangan;
     }
 
     /** Mencari kamar tersedia berdasarkan tipe */
     public Vector cariKamarTersedia(String tipeKamar) throws Exception {
-        return ruanganDB.findAvailable(tipeKamar);
+        return ruanganRepo.findAvailable(tipeKamar);
     }
 
     /** Mendapatkan semua ruangan */
     public Vector getSemuaRuangan() throws Exception {
-        return ruanganDB.findAll();
+        return ruanganRepo.findAll();
     }
 
     /** Mencari ruangan berdasarkan ID */
     public Ruangan cariById(String id) throws Exception {
-        Ruangan r = ruanganDB.findById(id);
+        Ruangan r = ruanganRepo.findById(id);
         if (r == null) throw new Exception("Ruangan tidak ditemukan");
         return r;
     }
 
     /** Update status kamar menjadi TERISI */
     public void isiKamar(String idRuangan, String namaPasien) throws Exception {
-        ruanganDB.updateStatus(idRuangan, Ruangan.STATUS_TERISI, namaPasien);
+        ruanganRepo.updateStatus(idRuangan, Ruangan.STATUS_TERISI, namaPasien);
     }
 
     /** Update status kamar menjadi KOSONG */
     public void kosongkanKamar(String idRuangan) throws Exception {
-        ruanganDB.updateStatus(idRuangan, Ruangan.STATUS_KOSONG, "");
+        ruanganRepo.updateStatus(idRuangan, Ruangan.STATUS_KOSONG, "");
     }
 
     /** Menghitung statistik kamar */
     public int[] hitungStatistik() throws Exception {
-        Vector semua = ruanganDB.findAll();
+        Vector semua = ruanganRepo.findAll();
         int total = semua.size();
         int terisi = 0;
         for (int i = 0; i < semua.size(); i++) {

@@ -1,8 +1,9 @@
 package ui;
 
 import javax.microedition.lcdui.*;
-import controller.PasienController;
+import service.PasienService;
 import model.Pasien;
+import util.ServiceFactory;
 
 /**
  * PasienFormScreen — Form pendaftaran pasien baru.
@@ -11,14 +12,14 @@ import model.Pasien;
  */
 public class PasienFormScreen extends Form implements CommandListener {
 
-    private PasienController controller;
+    private PasienService service;
     private TextField tfNama, tfTglLahir, tfAlamat, tfNoTelp;
     private ChoiceGroup cgJenisKelamin, cgAsuransi;
     private Command cmdDaftar, cmdBatal;
 
     public PasienFormScreen() {
         super("PENDAFTARAN PASIEN BARU");
-        this.controller = new PasienController();
+        this.service = ServiceFactory.getInstance().getPasienService();
 
         // Input fields
         tfNama = new TextField("Nama Lengkap", "", 100, TextField.ANY);
@@ -62,7 +63,7 @@ public class PasienFormScreen extends Form implements CommandListener {
             String[] asuransiArr = {"BPJS", "Mandiri", "Swasta"};
             String asuransi = asuransiArr[cgAsuransi.getSelectedIndex()];
 
-            Pasien pasien = controller.daftarPasienBaru(
+            Pasien pasien = service.daftarPasienBaru(
                 tfNama.getString(),
                 tfTglLahir.getString(),
                 jk,
@@ -94,3 +95,4 @@ public class PasienFormScreen extends Form implements CommandListener {
         }
     }
 }
+

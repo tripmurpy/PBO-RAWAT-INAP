@@ -8,7 +8,7 @@ package model;
 public class Penyakit {
 
     // ========== FIELD PRIVATE (ENCAPSULATION) ==========
-    private String kodeICD10;    // Kode ICD-10 (A00-Z99)
+    private String kodeICD10; // Kode ICD-10 (A00-Z99)
     private String namaPenyakit; // Nama penyakit
 
     // ========== KONSTRUKTOR ==========

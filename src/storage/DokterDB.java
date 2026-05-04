@@ -1,129 +1,67 @@
 package storage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.util.Vector;
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordStore;
 import model.Dokter;
 import model.repository.IDokterRepository;
 import util.RMSUtil;
 
 /**
  * DokterDB — Implementasi IDokterRepository menggunakan RMS.
- * POLYMORPHISM: implements IDokterRepository.
  */
-public class DokterDB implements IDokterRepository {
+public class DokterDB extends BaseDB implements IDokterRepository {
 
-    private static final String STORE_NAME = "dokter_store";
+    protected String getStoreName() { return "dokter_store"; }
 
-    public void save(Dokter dokter) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            byte[] data = serialize(dokter);
-            int recordId = RMSUtil.simpanRecord(rs, data);
-            dokter.setRecordId(recordId);
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-    }
+    protected String getEntityId(Object e) { return ((Dokter) e).getId(); }
+
+    protected void setRecordId(Object e, int rid) { ((Dokter) e).setRecordId(rid); }
+
+    public void save(Dokter d) throws Exception { saveEntity(d); }
 
     public Dokter findById(String id) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                byte[] data = rs.getRecord(rid);
-                Dokter d = deserialize(data);
-                d.setRecordId(rid);
-                if (id.equals(d.getId())) return d;
-            }
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-        return null;
+        return (Dokter) findByStringId(id);
     }
 
-    public Vector findAll() throws Exception {
-        Vector hasil = new Vector();
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                byte[] data = rs.getRecord(rid);
-                Dokter d = deserialize(data);
-                d.setRecordId(rid);
-                hasil.addElement(d);
-            }
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-        return hasil;
-    }
+    public Vector findAll() throws Exception { return getAllEntities(); }
+
+    public void delete(int recordId) throws Exception { deleteEntity(recordId); }
 
     public Vector findBySpesialis(String spesialisasi) throws Exception {
-        Vector hasil = new Vector();
-        String keyLower = spesialisasi.toLowerCase();
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                byte[] data = rs.getRecord(rid);
-                Dokter d = deserialize(data);
-                d.setRecordId(rid);
-                if (d.getSpesialisasi().toLowerCase().indexOf(keyLower) >= 0) {
-                    hasil.addElement(d);
-                }
+        Vector result = new Vector();
+        Vector all = getAllEntities();
+        for (int i = 0; i < all.size(); i++) {
+            Dokter d = (Dokter) all.elementAt(i);
+            if (d.getSpesialisasi().equalsIgnoreCase(spesialisasi)) {
+                result.addElement(d);
             }
-        } finally {
-            RMSUtil.tutupStore(rs);
         }
-        return hasil;
+        return result;
     }
 
-    public void update(Dokter dokter) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            byte[] data = serialize(dokter);
-            RMSUtil.updateRecord(rs, dokter.getRecordId(), data);
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
+    public void update(Dokter d) throws Exception {
+        updateEntity(d, d.getRecordId());
     }
 
-    public void delete(int recordId) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RMSUtil.hapusRecord(rs, recordId);
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
+    protected int getRecordIdFromObject(Object e) {
+        return ((Dokter) e).getRecordId();
     }
 
-    private byte[] serialize(Dokter d) throws Exception {
-        Object[] stream = RMSUtil.buatOutputStream();
-        DataOutputStream dos = (DataOutputStream) stream[1];
+    protected byte[] serialize(Object obj) throws Exception {
+        Dokter d = (Dokter) obj;
+        Object[] s = RMSUtil.buatOutputStream();
+        java.io.DataOutputStream dos = (java.io.DataOutputStream) s[1];
         dos.writeUTF(d.getId());
         dos.writeUTF(d.getNama());
         dos.writeUTF(d.getSpesialisasi());
         dos.writeUTF(d.getJadwal());
         dos.writeBoolean(d.isAktif());
-        byte[] result = RMSUtil.ambilBytes(stream);
+        byte[] result = RMSUtil.ambilBytes(s);
         dos.close();
         return result;
     }
 
-    private Dokter deserialize(byte[] data) throws Exception {
-        DataInputStream dis = RMSUtil.buatInputStream(data);
+    protected Object deserialize(byte[] data) throws Exception {
+        java.io.DataInputStream dis = RMSUtil.buatInputStream(data);
         Dokter d = new Dokter();
         d.setId(dis.readUTF());
         d.setNama(dis.readUTF());

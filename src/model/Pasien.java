@@ -10,14 +10,14 @@ package model;
 public class Pasien {
 
     // ========== FIELD PRIVATE (ENCAPSULATION) ==========
-    private int recordId;      // ID internal RMS
-    private String noRM;       // Nomor Rekam Medis (RM-YYYYMMDD-XXX)
-    private String nama;       // Nama lengkap pasien
-    private long tglLahir;     // Tanggal lahir (millisecond)
+    private int recordId; // ID internal RMS
+    private String noRM; // Nomor Rekam Medis (RM-YYYYMMDD-XXX)
+    private String nama; // Nama lengkap pasien
+    private long tglLahir; // Tanggal lahir (millisecond)
     private String jenisKelamin; // "L" atau "P"
-    private String alamat;     // Alamat lengkap
-    private String noTelp;     // Nomor telepon
-    private String asuransi;   // Jenis asuransi (BPJS/Mandiri/dll)
+    private String alamat; // Alamat lengkap
+    private String noTelp; // Nomor telepon
+    private String asuransi; // Jenis asuransi (BPJS/Mandiri/dll)
 
     // ========== KONSTRUKTOR ==========
 
@@ -30,9 +30,9 @@ public class Pasien {
     /**
      * Konstruktor lengkap untuk pembuatan pasien baru.
      */
-    public Pasien(String noRM, String nama, long tglLahir, 
-                  String jenisKelamin, String alamat, 
-                  String noTelp, String asuransi) {
+    public Pasien(String noRM, String nama, long tglLahir,
+            String jenisKelamin, String alamat,
+            String noTelp, String asuransi) {
         this.noRM = noRM;
         this.nama = nama;
         this.tglLahir = tglLahir;

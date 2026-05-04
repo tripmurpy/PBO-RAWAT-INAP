@@ -1,160 +1,85 @@
 package storage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.util.Vector;
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordStore;
 import model.Ruangan;
 import model.repository.IRuanganRepository;
 import util.RMSUtil;
 
 /**
  * RuanganDB — Implementasi IRuanganRepository menggunakan RMS.
- * POLYMORPHISM: implements IRuanganRepository.
  */
-public class RuanganDB implements IRuanganRepository {
+public class RuanganDB extends BaseDB implements IRuanganRepository {
 
-    private static final String STORE_NAME = "ruangan_store";
+    protected String getStoreName() { return "ruangan_store"; }
 
-    public void save(Ruangan ruangan) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            byte[] data = serialize(ruangan);
-            int recordId = RMSUtil.simpanRecord(rs, data);
-            ruangan.setRecordId(recordId);
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-    }
+    protected String getEntityId(Object e) { return ((Ruangan) e).getId(); }
+
+    protected void setRecordId(Object e, int rid) { ((Ruangan) e).setRecordId(rid); }
+
+    public void save(Ruangan r) throws Exception { saveEntity(r); }
 
     public Ruangan findById(String id) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                byte[] data = rs.getRecord(rid);
-                Ruangan r = deserialize(data);
-                r.setRecordId(rid);
-                if (id.equals(r.getId())) return r;
-            }
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-        return null;
+        return (Ruangan) findByStringId(id);
     }
 
-    public Vector findAll() throws Exception {
-        Vector hasil = new Vector();
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                byte[] data = rs.getRecord(rid);
-                Ruangan r = deserialize(data);
-                r.setRecordId(rid);
-                hasil.addElement(r);
-            }
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-        return hasil;
+    public void update(Ruangan r) throws Exception {
+        updateEntity(r, r.getRecordId());
     }
+
+    public Vector findAll() throws Exception { return getAllEntities(); }
 
     public Vector findAvailable(String tipeKamar) throws Exception {
-        Vector hasil = new Vector();
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                byte[] data = rs.getRecord(rid);
-                Ruangan r = deserialize(data);
-                r.setRecordId(rid);
-                if (r.isKosong()) {
-                    if (tipeKamar == null || tipeKamar.equals(r.getTipeKamar())) {
-                        hasil.addElement(r);
-                    }
-                }
+        Vector result = new Vector();
+        Vector all = getAllEntities();
+        for (int i = 0; i < all.size(); i++) {
+            Ruangan r = (Ruangan) all.elementAt(i);
+            if (r.isKosong() && (tipeKamar == null || r.getTipeKamar().equalsIgnoreCase(tipeKamar))) {
+                result.addElement(r);
             }
-        } finally {
-            RMSUtil.tutupStore(rs);
         }
-        return hasil;
+        return result;
     }
 
     public void updateStatus(String id, String status, String namaPasien) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int rid = re.nextRecordId();
-                byte[] data = rs.getRecord(rid);
-                Ruangan r = deserialize(data);
-                if (id.equals(r.getId())) {
-                    r.setStatusKamar(status);
-                    r.setNamaPasien(namaPasien != null ? namaPasien : "");
-                    r.setRecordId(rid);
-                    byte[] newData = serialize(r);
-                    RMSUtil.updateRecord(rs, rid, newData);
-                    return;
-                }
-            }
-        } finally {
-            RMSUtil.tutupStore(rs);
+        Ruangan r = findById(id);
+        if (r != null) {
+            r.setKosong(status.equalsIgnoreCase("KOSONG"));
+            r.setNamaPasien(namaPasien);
+            update(r);
         }
     }
 
-    public void update(Ruangan ruangan) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            byte[] data = serialize(ruangan);
-            RMSUtil.updateRecord(rs, ruangan.getRecordId(), data);
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
+    public void delete(int recordId) throws Exception { deleteEntity(recordId); }
+
+    protected int getRecordIdFromObject(Object e) {
+        return ((Ruangan) e).getRecordId();
     }
 
-    public void delete(int recordId) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RMSUtil.hapusRecord(rs, recordId);
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-    }
-
-    private byte[] serialize(Ruangan r) throws Exception {
-        Object[] stream = RMSUtil.buatOutputStream();
-        DataOutputStream dos = (DataOutputStream) stream[1];
+    protected byte[] serialize(Object obj) throws Exception {
+        Ruangan r = (Ruangan) obj;
+        Object[] s = RMSUtil.buatOutputStream();
+        java.io.DataOutputStream dos = (java.io.DataOutputStream) s[1];
         dos.writeUTF(r.getId());
         dos.writeUTF(r.getNamaRuangan());
         dos.writeUTF(r.getTipeKamar());
         dos.writeInt(r.getKapasitas());
-        dos.writeUTF(r.getStatusKamar());
-        dos.writeUTF(r.getNamaPasien() != null ? r.getNamaPasien() : "");
-        byte[] result = RMSUtil.ambilBytes(stream);
+        dos.writeBoolean(r.isKosong());
+        dos.writeUTF(r.getNoRM() == null ? "" : r.getNoRM());
+        dos.writeUTF(r.getNamaPasien() == null ? "" : r.getNamaPasien());
+        byte[] result = RMSUtil.ambilBytes(s);
         dos.close();
         return result;
     }
 
-    private Ruangan deserialize(byte[] data) throws Exception {
-        DataInputStream dis = RMSUtil.buatInputStream(data);
+    protected Object deserialize(byte[] data) throws Exception {
+        java.io.DataInputStream dis = RMSUtil.buatInputStream(data);
         Ruangan r = new Ruangan();
         r.setId(dis.readUTF());
         r.setNamaRuangan(dis.readUTF());
         r.setTipeKamar(dis.readUTF());
         r.setKapasitas(dis.readInt());
-        r.setStatusKamar(dis.readUTF());
+        r.setKosong(dis.readBoolean());
+        r.setNoRM(dis.readUTF());
         r.setNamaPasien(dis.readUTF());
         dis.close();
         return r;

@@ -2,7 +2,7 @@ package service;
 
 import java.util.Vector;
 import model.Dokter;
-import storage.DokterDB;
+import model.repository.IDokterRepository;
 import util.IDGenerator;
 import util.Validator;
 
@@ -11,10 +11,10 @@ import util.Validator;
  */
 public class DokterService {
 
-    private DokterDB dokterDB;
+    private IDokterRepository dokterRepo;
 
-    public DokterService() {
-        this.dokterDB = new DokterDB();
+    public DokterService(IDokterRepository dokterRepo) {
+        this.dokterRepo = dokterRepo;
     }
 
     /** Menambah dokter baru */
@@ -26,34 +26,34 @@ public class DokterService {
         String id = IDGenerator.generateDokterId();
         Dokter dokter = new Dokter(id, nama.trim(), spesialisasi.trim(), 
                                     jadwal != null ? jadwal.trim() : "-");
-        dokterDB.save(dokter);
+        dokterRepo.save(dokter);
         return dokter;
     }
 
     /** Mencari dokter berdasarkan ID */
     public Dokter cariById(String id) throws Exception {
-        Dokter d = dokterDB.findById(id);
+        Dokter d = dokterRepo.findById(id);
         if (d == null) throw new Exception("Dokter tidak ditemukan");
         return d;
     }
 
     /** Mendapatkan semua dokter */
     public Vector getSemuaDokter() throws Exception {
-        return dokterDB.findAll();
+        return dokterRepo.findAll();
     }
 
     /** Mencari dokter berdasarkan spesialisasi */
     public Vector cariBySpesialis(String spesialisasi) throws Exception {
-        return dokterDB.findBySpesialis(spesialisasi);
+        return dokterRepo.findBySpesialis(spesialisasi);
     }
 
     /** Memperbarui data dokter */
     public void updateDokter(Dokter dokter) throws Exception {
-        dokterDB.update(dokter);
+        dokterRepo.update(dokter);
     }
 
     /** Menghapus dokter */
     public void hapusDokter(int recordId) throws Exception {
-        dokterDB.delete(recordId);
+        dokterRepo.delete(recordId);
     }
 }

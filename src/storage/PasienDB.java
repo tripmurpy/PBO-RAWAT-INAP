@@ -1,162 +1,74 @@
 package storage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.util.Vector;
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordStore;
 import model.Pasien;
 import model.repository.IPasienRepository;
 import util.RMSUtil;
 
 /**
- * PasienDB — Implementasi konkret IPasienRepository menggunakan RMS.
- * 
- * POLYMORPHISM: Mengimplementasikan interface IPasienRepository.
- * Service layer cukup mengenal interface, tidak perlu tahu detail RMS.
- * 
- * ENCAPSULATION: Detail serialisasi/deserialisasi tersembunyi
- * di metode private serialize() dan deserialize().
+ * PasienDB — Implementasi IPasienRepository menggunakan RMS.
  */
-public class PasienDB implements IPasienRepository {
+public class PasienDB extends BaseDB implements IPasienRepository {
 
-    private static final String STORE_NAME = "pasien_store";
+    protected String getStoreName() { return "pasien_store"; }
 
-    // ========== IMPLEMENTASI INTERFACE (POLYMORPHISM) ==========
+    protected String getEntityId(Object e) { return ((Pasien) e).getNoRM(); }
+    
+    protected void setRecordId(Object e, int rid) { ((Pasien) e).setRecordId(rid); }
 
-    public void save(Pasien pasien) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            byte[] data = serialize(pasien);
-            int recordId = RMSUtil.simpanRecord(rs, data);
-            pasien.setRecordId(recordId);
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-    }
+    public void save(Pasien p) throws Exception { saveEntity(p); }
 
     public Pasien findByRM(String noRM) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int id = re.nextRecordId();
-                byte[] data = rs.getRecord(id);
-                Pasien p = deserialize(data);
-                p.setRecordId(id);
-                if (noRM.equals(p.getNoRM())) {
-                    return p;
-                }
-            }
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-        return null;
+        return (Pasien) findByStringId(noRM);
     }
+
+    public Vector getAll() throws Exception { return getAllEntities(); }
+
+    public void update(Pasien p) throws Exception {
+        updateEntity(p, p.getRecordId());
+    }
+
+    public void delete(int recordId) throws Exception { deleteEntity(recordId); }
 
     public Pasien findById(int recordId) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            byte[] data = RMSUtil.ambilRecord(rs, recordId);
-            Pasien p = deserialize(data);
-            p.setRecordId(recordId);
-            return p;
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
+        return (Pasien) findByRecordId(recordId);
     }
 
-    public Vector getAll() throws Exception {
-        Vector hasil = new Vector();
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int id = re.nextRecordId();
-                byte[] data = rs.getRecord(id);
-                Pasien p = deserialize(data);
-                p.setRecordId(id);
-                hasil.addElement(p);
-            }
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-        return hasil;
-    }
-
-    public void update(Pasien pasien) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            byte[] data = serialize(pasien);
-            RMSUtil.updateRecord(rs, pasien.getRecordId(), data);
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
-    }
-
-    public void delete(int recordId) throws Exception {
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RMSUtil.hapusRecord(rs, recordId);
-        } finally {
-            RMSUtil.tutupStore(rs);
-        }
+    protected int getRecordIdFromObject(Object e) {
+        return ((Pasien) e).getRecordId();
     }
 
     public Vector cariByNama(String keyword) throws Exception {
         Vector hasil = new Vector();
+        Vector all = getAllEntities();
         String keyLower = keyword.toLowerCase();
-        RecordStore rs = null;
-        try {
-            rs = RMSUtil.bukaStore(STORE_NAME);
-            RecordEnumeration re = RMSUtil.ambilSemuaRecord(rs);
-            while (re.hasNextElement()) {
-                int id = re.nextRecordId();
-                byte[] data = rs.getRecord(id);
-                Pasien p = deserialize(data);
-                p.setRecordId(id);
-                if (p.getNama().toLowerCase().indexOf(keyLower) >= 0) {
-                    hasil.addElement(p);
-                }
-            }
-        } finally {
-            RMSUtil.tutupStore(rs);
+        for (int i = 0; i < all.size(); i++) {
+            Pasien p = (Pasien) all.elementAt(i);
+            if (p.getNama().toLowerCase().indexOf(keyLower) >= 0)
+                hasil.addElement(p);
         }
         return hasil;
     }
 
-    // ========== SERIALISASI PRIVATE (ENCAPSULATION) ==========
-
-    private byte[] serialize(Pasien p) throws Exception {
-        Object[] stream = RMSUtil.buatOutputStream();
-        DataOutputStream dos = (DataOutputStream) stream[1];
-        dos.writeUTF(p.getNoRM());
-        dos.writeUTF(p.getNama());
-        dos.writeLong(p.getTglLahir());
-        dos.writeUTF(p.getJenisKelamin());
-        dos.writeUTF(p.getAlamat());
-        dos.writeUTF(p.getNoTelp());
+    protected byte[] serialize(Object obj) throws Exception {
+        Pasien p = (Pasien) obj;
+        Object[] s = RMSUtil.buatOutputStream();
+        java.io.DataOutputStream dos = (java.io.DataOutputStream) s[1];
+        dos.writeUTF(p.getNoRM()); dos.writeUTF(p.getNama());
+        dos.writeLong(p.getTglLahir()); dos.writeUTF(p.getJenisKelamin());
+        dos.writeUTF(p.getAlamat()); dos.writeUTF(p.getNoTelp());
         dos.writeUTF(p.getAsuransi());
-        byte[] result = RMSUtil.ambilBytes(stream);
+        byte[] result = RMSUtil.ambilBytes(s);
         dos.close();
         return result;
     }
 
-    private Pasien deserialize(byte[] data) throws Exception {
-        DataInputStream dis = RMSUtil.buatInputStream(data);
+    protected Object deserialize(byte[] data) throws Exception {
+        java.io.DataInputStream dis = RMSUtil.buatInputStream(data);
         Pasien p = new Pasien();
-        p.setNoRM(dis.readUTF());
-        p.setNama(dis.readUTF());
-        p.setTglLahir(dis.readLong());
-        p.setJenisKelamin(dis.readUTF());
-        p.setAlamat(dis.readUTF());
-        p.setNoTelp(dis.readUTF());
+        p.setNoRM(dis.readUTF()); p.setNama(dis.readUTF());
+        p.setTglLahir(dis.readLong()); p.setJenisKelamin(dis.readUTF());
+        p.setAlamat(dis.readUTF()); p.setNoTelp(dis.readUTF());
         p.setAsuransi(dis.readUTF());
         dis.close();
         return p;

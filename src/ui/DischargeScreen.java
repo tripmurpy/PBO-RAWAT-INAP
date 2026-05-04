@@ -1,9 +1,13 @@
 package ui;
+/*
+ * Copyright (c) 2026 tripmurpy/PBO-RAWAT-INAP
+ */
 
 import javax.microedition.lcdui.*;
-import controller.AdmisiController;
+import service.AdmisiService;
 import model.Admisi;
 import util.DateUtil;
+import util.ServiceFactory;
 
 /**
  * DischargeScreen — Form keluar pasien (discharge).
@@ -11,7 +15,7 @@ import util.DateUtil;
  */
 public class DischargeScreen extends Form implements CommandListener {
 
-    private AdmisiController controller;
+    private AdmisiService admisiService;
     private TextField tfCari, tfDiagnosisAkhir, tfKodeICD10, tfTglKeluar, tfCatatan;
     private StringItem siInfo;
     private Command cmdCari, cmdSelesai, cmdBatal;
@@ -19,7 +23,7 @@ public class DischargeScreen extends Form implements CommandListener {
 
     public DischargeScreen() {
         super("KELUAR PASIEN");
-        this.controller = new AdmisiController();
+        this.admisiService = ServiceFactory.getInstance().getAdmisiService();
 
         tfCari = new TextField("No. RM / ID Admisi", "", 20, TextField.ANY);
         siInfo = new StringItem("Info Admisi", "Belum dicari");
@@ -48,23 +52,24 @@ public class DischargeScreen extends Form implements CommandListener {
     private void cariAdmisi() {
         try {
             String keyword = tfCari.getString().trim();
-            admisiAktif = controller.cariAdmisiAktifByRM(keyword);
+            admisiAktif = admisiService.cariAdmisiAktifByRM(keyword);
             if (admisiAktif == null) {
-                siInfo.setText(new StringBuffer().append("Admisi aktif tidak ditemukan untuk: ").append(keyword).toString());
+                siInfo.setText(
+                        new StringBuffer().append("Admisi aktif tidak ditemukan untuk: ").append(keyword).toString());
                 return;
             }
 
             siInfo.setText(new StringBuffer()
-                .append("ID Admisi : ").append(admisiAktif.getIdAdmisi()).append("\n")
-                .append("No. RM    : ").append(admisiAktif.getNoRMPasien()).append("\n")
-                .append("Masuk     : ").append(DateUtil.formatTanggal(admisiAktif.getTglMasuk())).append("\n")
-                .append("Diagnosis : ").append(admisiAktif.getDiagnosisAwal()).toString());
+                    .append("ID Admisi : ").append(admisiAktif.getIdAdmisi()).append("\n")
+                    .append("No. RM    : ").append(admisiAktif.getNoRMPasien()).append("\n")
+                    .append("Masuk     : ").append(DateUtil.formatTanggal(admisiAktif.getTglMasuk())).append("\n")
+                    .append("Diagnosis : ").append(admisiAktif.getDiagnosisAwal()).toString());
 
             // Tampilkan form discharge
             tfDiagnosisAkhir = new TextField("Diagnosis Akhir", "", 200, TextField.ANY);
             tfKodeICD10 = new TextField("Kode ICD-10", "", 10, TextField.ANY);
-            tfTglKeluar = new TextField("Tgl Keluar (DD/MM/YYYY)", 
-                                        DateUtil.tanggalHariIni(), 10, TextField.ANY);
+            tfTglKeluar = new TextField("Tgl Keluar (DD/MM/YYYY)",
+                    DateUtil.tanggalHariIni(), 10, TextField.ANY);
             tfCatatan = new TextField("Catatan", "", 200, TextField.ANY);
 
             append(tfDiagnosisAkhir);
@@ -81,20 +86,19 @@ public class DischargeScreen extends Form implements CommandListener {
 
     private void prosesDischarge() {
         try {
-            Admisi hasil = controller.discharge(
-                admisiAktif.getIdAdmisi(),
-                tfDiagnosisAkhir.getString(),
-                tfKodeICD10.getString(),
-                tfTglKeluar.getString(),
-                tfCatatan.getString()
-            );
+            Admisi hasil = admisiService.discharge(
+                    admisiAktif.getIdAdmisi(),
+                    tfDiagnosisAkhir.getString(),
+                    tfKodeICD10.getString(),
+                    tfTglKeluar.getString(),
+                    tfCatatan.getString());
 
-            int lamaRawat = controller.hitungLamaRawat(hasil);
+            int lamaRawat = admisiService.hitungLamaRawat(hasil);
 
             Alert alert = new Alert("PASIEN BERHASIL KELUAR",
-                new StringBuffer().append("Kamar kembali KOSONG\n")
-                .append("Lama rawat: ").append(lamaRawat).append(" hari").toString(),
-                null, AlertType.CONFIRMATION);
+                    new StringBuffer().append("Kamar kembali KOSONG\n")
+                            .append("Lama rawat: ").append(lamaRawat).append(" hari").toString(),
+                    null, AlertType.CONFIRMATION);
             alert.setTimeout(Alert.FOREVER);
             Command cmdOK = new Command("OK", Command.OK, 1);
             alert.addCommand(cmdOK);
