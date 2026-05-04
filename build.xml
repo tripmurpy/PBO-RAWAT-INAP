@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Build Script: Sistem Rawat Inap RS
+    Pipeline: javac → preverify → jar → jad
+    
+    Sesuaikan property wtk.home dengan lokasi Sun WTK di komputer Anda.
+-->
+<project name="hospital-rawat-inap" default="build" basedir=".">
+
+    <!-- ========== PROPERTIES ========== -->
+    <!-- Sesuaikan path WTK di komputer Anda -->
+    <property name="wtk.home" value="C:/WTK2.5.2"/>
+    <property name="midp.lib" value="${wtk.home}/lib/midpapi20.jar"/>
+    <property name="cldc.lib" value="${wtk.home}/lib/cldcapi11.jar"/>
+    <property name="preverify.exe" value="${wtk.home}/bin/preverify"/>
+
+    <property name="src.dir" value="src"/>
+    <property name="bin.dir" value="bin"/>
+    <property name="preverified.dir" value="preverified"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="app.name" value="hospital-rawat-inap"/>
+
+    <!-- ========== CLEAN ========== -->
+    <target name="clean" description="Hapus file build sebelumnya">
+        <delete dir="${bin.dir}" failonerror="false"/>
+        <delete dir="${preverified.dir}" failonerror="false"/>
+        <delete dir="${dist.dir}" failonerror="false"/>
+    </target>
+
+    <!-- ========== INIT ========== -->
+    <target name="init" description="Buat direktori build">
+        <mkdir dir="${bin.dir}"/>
+        <mkdir dir="${preverified.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+
+    <!-- ========== COMPILE ========== -->
+    <target name="compile" depends="init" description="Kompilasi source .java">
+        <javac srcdir="${src.dir}"
+               destdir="${bin.dir}"
+               source="1.8"
+               target="1.8"
+               bootclasspath="${midp.lib}${path.separator}${cldc.lib}"
+               includeantruntime="false">
+        </javac>
+    </target>
+
+    <!-- ========== PREVERIFY ========== -->
+    <target name="preverify" depends="compile" description="CLDC preverification">
+        <exec executable="${preverify.exe}" failonerror="true">
+            <arg value="-classpath"/>
+            <arg value="${midp.lib}${path.separator}${cldc.lib}"/>
+            <arg value="-d"/>
+            <arg value="${preverified.dir}"/>
+            <arg value="${bin.dir}"/>
+        </exec>
+    </target>
+
+    <!-- ========== PACKAGE (JAR) ========== -->
+    <target name="package" depends="preverify" description="Buat JAR distributable">
+        <jar destfile="${dist.dir}/${app.name}.jar"
+             manifest="MANIFEST.MF"
+             basedir="${preverified.dir}">
+        </jar>
+        <!-- Update JAD dengan ukuran JAR -->
+        <length file="${dist.dir}/${app.name}.jar" property="jar.size"/>
+        <copy file="${app.name}.jad" tofile="${dist.dir}/${app.name}.jad" overwrite="true">
+            <filterset>
+                <filter token="JAR_SIZE" value="${jar.size}"/>
+            </filterset>
+        </copy>
+    </target>
+
+    <!-- ========== BUILD (DEFAULT) ========== -->
+    <target name="build" depends="clean,package" description="Full build pipeline">
+        <echo message="Build selesai! JAR: ${dist.dir}/${app.name}.jar"/>
+    </target>
+
+    <!-- ========== RUN (EMULATOR) ========== -->
+    <target name="run" depends="build" description="Jalankan di emulator WTK">
+        <exec executable="${wtk.home}/bin/emulator">
+            <arg value="-Xdescriptor:${dist.dir}/${app.name}.jad"/>
+        </exec>
+    </target>
+
+</project>
