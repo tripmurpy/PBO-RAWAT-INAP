@@ -23,7 +23,7 @@ public class DischargeScreen extends Form implements CommandListener {
 
     public DischargeScreen() {
         super("KELUAR PASIEN");
-        this.admisiService = ServiceFactory.getInstance().getAdmisiService();
+        this.admisiService = ServiceFactory.getAdmisiService();
 
         tfCari = new TextField("No. RM / ID Admisi", "", 20, TextField.ANY);
         siInfo = new StringItem("Info Admisi", "Belum dicari");

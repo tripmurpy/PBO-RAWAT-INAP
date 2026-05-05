@@ -188,8 +188,6 @@ public class Admisi {
     // ========== TO STRING ==========
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(idAdmisi).append(" [").append(status).append("]");
-        return sb.toString();
+        return idAdmisi + " [" + status + "]";
     }
 }

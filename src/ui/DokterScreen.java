@@ -20,7 +20,7 @@ public class DokterScreen extends Form implements CommandListener {
 
     public DokterScreen() {
         super("MANAJEMEN DOKTER");
-        this.dokterService = ServiceFactory.getInstance().getDokterService();
+        this.dokterService = ServiceFactory.getDokterService();
 
         siInfo = new StringItem("", "");
         muatDaftarDokter();
