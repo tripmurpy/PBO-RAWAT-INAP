@@ -1,0 +1,8 @@
+# Salin file ini menjadi `build.properties` lalu sesuaikan path WTK.
+# build.properties tidak di-commit (lokal per developer).
+
+# Windows:
+# wtk.home=C:/WTK2.5.2
+
+# Linux/Mac (Sun WTK 2.5.2 Linux atau MicroEmulator/freej2me):
+# wtk.home=/opt/WTK2.5.2

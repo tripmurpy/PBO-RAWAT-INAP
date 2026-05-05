@@ -114,11 +114,11 @@ public class LoginScreen extends Canvas {
         g.fillRoundRect(fieldX, passwordFieldY, fieldW, fieldH, 6, 6);
         g.setColor(WARNA_TEKS);
         g.setFont(fontSedang);
-        // Tampilkan password sebagai ****
-        String mask = "";
-        for (int i = 0; i < password.length(); i++)
-            mask += "*";
-        g.drawString(mask, fieldX + 8, passwordFieldY + 4, Graphics.TOP | Graphics.LEFT);
+        // Tampilkan password sebagai **** (StringBuffer agar tidak alokasi N kali)
+        int pwLen = password.length();
+        StringBuffer maskBuf = new StringBuffer(pwLen);
+        for (int i = 0; i < pwLen; i++) maskBuf.append('*');
+        g.drawString(maskBuf.toString(), fieldX + 8, passwordFieldY + 4, Graphics.TOP | Graphics.LEFT);
         fy += fieldH + 15;
 
         // Tombol LOGIN

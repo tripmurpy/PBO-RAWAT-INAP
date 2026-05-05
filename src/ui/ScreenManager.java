@@ -55,8 +55,13 @@ public class ScreenManager {
         }
     }
 
-    /** Logout: reset state and show LoginScreen */
+    /** Logout: bersihkan sesi auth, reset history, kembali ke LoginScreen. */
     public void logout() {
+        try {
+            util.ServiceFactory.getInstance().getAuthService().logout();
+        } catch (Exception ignore) {
+            // service belum di-init; abaikan
+        }
         historyStack.removeAllElements();
         display.setCurrent(new LoginScreen());
     }
