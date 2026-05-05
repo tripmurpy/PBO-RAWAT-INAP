@@ -1,6 +1,7 @@
-MIDlet-1: HospitalMIDlet, , ui.HospitalMIDlet
+MIDlet-1: Sistem Rawat Inap,,ui.HospitalMIDlet
 MIDlet-Name: Sistem Rawat Inap
 MIDlet-Vendor: RS XYZ
 MIDlet-Version: 1.0.0
 MicroEdition-Configuration: CLDC-1.1
 MicroEdition-Profile: MIDP-2.0
+MIDlet-Description: Aplikasi Manajemen Rawat Inap Rumah Sakit

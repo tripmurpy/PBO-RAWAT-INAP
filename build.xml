@@ -2,50 +2,64 @@
 <!--
     Build Script: Sistem Rawat Inap RS
     Pipeline: javac → preverify → jar → jad
-    
-    Sesuaikan property wtk.home dengan lokasi Sun WTK di komputer Anda.
+
+    Konfigurasi WTK dapat di-override via:
+      ant -Dwtk.home=/path/to/WTK
+    atau di file `build.properties` di root project.
+
+    Source/target di-set 1.3 agar bytecode kompatibel dengan CLDC 1.1.
 -->
 <project name="hospital-rawat-inap" default="build" basedir=".">
 
-    <!-- ========== PROPERTIES ========== -->
-    <!-- Sesuaikan path WTK di komputer Anda -->
-    <property name="wtk.home" value="C:/WTK2.5.2"/>
-    <property name="midp.lib" value="${wtk.home}/lib/midpapi20.jar"/>
-    <property name="cldc.lib" value="${wtk.home}/lib/cldcapi11.jar"/>
+    <!-- Override-able via -Dwtk.home=... atau build.properties -->
+    <property file="build.properties"/>
+    <property environment="env"/>
+    <property name="wtk.home" value="${env.WTK_HOME}"/>
+
+    <property name="midp.lib"      value="${wtk.home}/lib/midpapi20.jar"/>
+    <property name="cldc.lib"      value="${wtk.home}/lib/cldcapi11.jar"/>
     <property name="preverify.exe" value="${wtk.home}/bin/preverify"/>
 
-    <property name="src.dir" value="src"/>
-    <property name="bin.dir" value="bin"/>
+    <property name="src.dir"         value="src"/>
+    <property name="bin.dir"         value="bin"/>
     <property name="preverified.dir" value="preverified"/>
-    <property name="dist.dir" value="dist"/>
-    <property name="app.name" value="hospital-rawat-inap"/>
+    <property name="dist.dir"        value="dist"/>
+    <property name="app.name"        value="hospital-rawat-inap"/>
 
-    <!-- ========== CLEAN ========== -->
-    <target name="clean" description="Hapus file build sebelumnya">
-        <delete dir="${bin.dir}" failonerror="false"/>
-        <delete dir="${preverified.dir}" failonerror="false"/>
-        <delete dir="${dist.dir}" failonerror="false"/>
+    <target name="check-wtk">
+        <fail message="wtk.home tidak di-set. Set env WTK_HOME atau buat build.properties dengan baris: wtk.home=/path/ke/WTK">
+            <condition>
+                <or>
+                    <equals arg1="${wtk.home}" arg2=""/>
+                    <equals arg1="${wtk.home}" arg2="$${env.WTK_HOME}"/>
+                </or>
+            </condition>
+        </fail>
     </target>
 
-    <!-- ========== INIT ========== -->
-    <target name="init" description="Buat direktori build">
+    <target name="clean" description="Hapus artefak build">
+        <delete dir="${bin.dir}"         failonerror="false"/>
+        <delete dir="${preverified.dir}" failonerror="false"/>
+        <delete dir="${dist.dir}"        failonerror="false"/>
+    </target>
+
+    <target name="init">
         <mkdir dir="${bin.dir}"/>
         <mkdir dir="${preverified.dir}"/>
         <mkdir dir="${dist.dir}"/>
     </target>
 
-    <!-- ========== COMPILE ========== -->
-    <target name="compile" depends="init" description="Kompilasi source .java">
+    <target name="compile" depends="check-wtk,init" description="Kompilasi source .java">
         <javac srcdir="${src.dir}"
                destdir="${bin.dir}"
-               source="1.8"
-               target="1.8"
+               source="1.3"
+               target="1.3"
                bootclasspath="${midp.lib}${path.separator}${cldc.lib}"
-               includeantruntime="false">
-        </javac>
+               includeantruntime="false"
+               debug="false"
+               optimize="true"/>
     </target>
 
-    <!-- ========== PREVERIFY ========== -->
     <target name="preverify" depends="compile" description="CLDC preverification">
         <exec executable="${preverify.exe}" failonerror="true">
             <arg value="-classpath"/>
@@ -56,13 +70,11 @@
         </exec>
     </target>
 
-    <!-- ========== PACKAGE (JAR) ========== -->
-    <target name="package" depends="preverify" description="Buat JAR distributable">
+    <target name="package" depends="preverify" description="Buat JAR + JAD">
         <jar destfile="${dist.dir}/${app.name}.jar"
              manifest="MANIFEST.MF"
-             basedir="${preverified.dir}">
-        </jar>
-        <!-- Update JAD dengan ukuran JAR -->
+             basedir="${preverified.dir}"/>
+
         <length file="${dist.dir}/${app.name}.jar" property="jar.size"/>
         <copy file="${app.name}.jad" tofile="${dist.dir}/${app.name}.jad" overwrite="true">
             <filterset>
@@ -71,12 +83,10 @@
         </copy>
     </target>
 
-    <!-- ========== BUILD (DEFAULT) ========== -->
-    <target name="build" depends="clean,package" description="Full build pipeline">
-        <echo message="Build selesai! JAR: ${dist.dir}/${app.name}.jar"/>
+    <target name="build" depends="clean,package">
+        <echo message="Build OK → ${dist.dir}/${app.name}.jar (${jar.size} bytes)"/>
     </target>
 
-    <!-- ========== RUN (EMULATOR) ========== -->
     <target name="run" depends="build" description="Jalankan di emulator WTK">
         <exec executable="${wtk.home}/bin/emulator">
             <arg value="-Xdescriptor:${dist.dir}/${app.name}.jad"/>

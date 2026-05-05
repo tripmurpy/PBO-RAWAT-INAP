@@ -152,7 +152,7 @@ public class DashboardScreen extends Canvas {
                 sm.tampilkanLayar(new KunjunganScreen());
                 break;
             case 7: // Logout
-                sm.tampilkanLayar(new LoginScreen());
+                sm.logout();
                 break;
         }
     }
