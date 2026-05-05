@@ -1,0 +1,35 @@
+Buildfile: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\build.xml
+
+clean:
+   [delete] Deleting directory C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\bin
+   [delete] Deleting directory C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\preverified
+   [delete] Deleting directory C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\dist
+
+init:
+    [mkdir] Created dir: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\bin
+    [mkdir] Created dir: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\preverified
+    [mkdir] Created dir: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\dist
+
+compile:
+    [javac] Compiling 79 source files to C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\bin
+    [javac] warning: [options] source value 8 is obsolete and will be removed in a future release
+    [javac] warning: [options] target value 8 is obsolete and will be removed in a future release
+    [javac] warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+    [javac] 3 warnings
+
+preverify:
+
+package:
+      [jar] Building jar: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\dist\hospital-rawat-inap.jar
+     [copy] Copying 1 file to C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\dist
+
+build:
+     [echo] Build selesai! JAR: dist/hospital-rawat-inap.jar
+
+run:
+     [exec] com.sun.kvem.midletsuite.InvalidJadException: Reason = 31
+     [exec] The jar size value in the Application Descriptor does not match the real jar file size.
+     [exec] Result: 1
+
+BUILD SUCCESSFUL
+Total time: 4 seconds

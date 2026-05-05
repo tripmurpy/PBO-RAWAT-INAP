@@ -2,66 +2,48 @@ package model;
 
 /**
  * Pasien — Entitas data pasien rumah sakit.
- * 
- * ENCAPSULATION: Semua field bersifat private dengan getter/setter.
- * Field noRM bersifat read-only setelah di-set (tidak ada setter publik
- * untuk noRM agar integritas data terjaga).
+ *
+ * INHERITANCE: Extends Person (nama, tglLahir, jenisKelamin via Entity.id).
+ * ENCAPSULATION: Field private, akses via getter/setter.
+ * POLYMORPHISM: Override tampilkan() menampilkan status rawat.
  */
-public class Pasien {
+public class Pasien extends Person {
 
-    // ========== FIELD PRIVATE (ENCAPSULATION) ==========
-    private int recordId; // ID internal RMS
-    private String noRM; // Nomor Rekam Medis (RM-YYYYMMDD-XXX)
-    private String nama; // Nama lengkap pasien
-    private long tglLahir; // Tanggal lahir (millisecond)
-    private String jenisKelamin; // "L" atau "P"
-    private String alamat; // Alamat lengkap
-    private String noTelp; // Nomor telepon
-    private String asuransi; // Jenis asuransi (BPJS/Mandiri/dll)
+    public static final String STATUS_AKTIF = "AKTIF";
+    public static final String STATUS_DIRAWAT = "DIRAWAT";
+    public static final String STATUS_PULANG = "PULANG";
 
-    // ========== KONSTRUKTOR ==========
+    private int recordId;
+    private String alamat;
+    private String noTelp;
+    private String asuransi;
+    private String status;
 
-    /**
-     * Konstruktor default.
-     */
     public Pasien() {
+        this.status = STATUS_AKTIF;
     }
 
-    /**
-     * Konstruktor lengkap untuk pembuatan pasien baru.
-     */
     public Pasien(String noRM, String nama, long tglLahir,
             String jenisKelamin, String alamat,
             String noTelp, String asuransi) {
-        this.noRM = noRM;
-        this.nama = nama;
-        this.tglLahir = tglLahir;
-        this.jenisKelamin = jenisKelamin;
+        super(noRM, nama, tglLahir, jenisKelamin);
         this.alamat = alamat;
         this.noTelp = noTelp;
         this.asuransi = asuransi;
+        this.status = STATUS_AKTIF;
     }
 
-    // ========== GETTER (ENCAPSULATION) ==========
+    // noRM is the id field from Entity
+    public String getNoRM() {
+        return getId();
+    }
+
+    public void setNoRM(String noRM) {
+        setId(noRM);
+    }
 
     public int getRecordId() {
         return recordId;
-    }
-
-    public String getNoRM() {
-        return noRM;
-    }
-
-    public String getNama() {
-        return nama;
-    }
-
-    public long getTglLahir() {
-        return tglLahir;
-    }
-
-    public String getJenisKelamin() {
-        return jenisKelamin;
     }
 
     public String getAlamat() {
@@ -76,28 +58,12 @@ public class Pasien {
         return asuransi;
     }
 
-    // ========== SETTER (ENCAPSULATION) ==========
-    // noRM TIDAK memiliki setter publik — hanya bisa di-set via konstruktor
-    // atau setNoRM() internal untuk deserialisasi dari RMS
+    public String getStatus() {
+        return status;
+    }
 
     public void setRecordId(int recordId) {
         this.recordId = recordId;
-    }
-
-    public void setNoRM(String noRM) {
-        this.noRM = noRM;
-    }
-
-    public void setNama(String nama) {
-        this.nama = nama;
-    }
-
-    public void setTglLahir(long tglLahir) {
-        this.tglLahir = tglLahir;
-    }
-
-    public void setJenisKelamin(String jenisKelamin) {
-        this.jenisKelamin = jenisKelamin;
     }
 
     public void setAlamat(String alamat) {
@@ -112,12 +78,28 @@ public class Pasien {
         this.asuransi = asuransi;
     }
 
-    // ========== TO STRING ==========
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-    /**
-     * Representasi ringkas pasien.
-     */
+    public boolean isAktif() {
+        return STATUS_AKTIF.equals(status);
+    }
+
+    public boolean isDirawat() {
+        return STATUS_DIRAWAT.equals(status);
+    }
+
+    /** POLYMORPHISM: Override tampilkan() dengan status. */
+    public String tampilkan() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(nama).append(" [").append(status).append("]");
+        return sb.toString();
+    }
+
     public String toString() {
-        return noRM + " - " + nama;
+        StringBuffer sb = new StringBuffer();
+        sb.append(getNoRM()).append(" - ").append(nama);
+        return sb.toString();
     }
 }

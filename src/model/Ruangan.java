@@ -140,6 +140,8 @@ public class Ruangan {
     // ========== TO STRING ==========
 
     public String toString() {
-        return namaRuangan + " [" + statusKamar + "]";
+        StringBuffer sb = new StringBuffer();
+        sb.append(namaRuangan).append(" [").append(statusKamar).append("]");
+        return sb.toString();
     }
 }

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ant build *)",
+      "Bash(grep -v \"\\\\.append\\\\|StringBuffer\\\\|//\")",
+      "Bash(ant run *)",
+      "Bash(tasklist)",
+      "Bash(tee run_output.log)"
+    ]
+  }
+}

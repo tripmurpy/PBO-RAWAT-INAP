@@ -59,6 +59,8 @@ public class Asuransi {
     // ========== TO STRING ==========
 
     public String toString() {
-        return namaAsuransi + " (" + tipeKlaim + ")";
+        StringBuffer sb = new StringBuffer();
+        sb.append(namaAsuransi).append(" (").append(tipeKlaim).append(")");
+        return sb.toString();
     }
 }

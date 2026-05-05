@@ -2,48 +2,42 @@ package ui;
 
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
+import util.ServiceFactory;
+import util.SeedData;
 
 /**
- * HospitalMIDlet — Entry point aplikasi J2ME.
- * 
+ * HospitalMIDlet — Entry point aplikasi J2ME Rawat Inap.
+ *
  * INHERITANCE: Extends MIDlet (wajib untuk J2ME app).
- * Menginisialisasi ScreenManager dan menampilkan LoginScreen.
+ * Inisialisasi ServiceFactory, SeedData, ScreenManager, lalu LoginScreen.
  */
 public class HospitalMIDlet extends MIDlet {
 
     private boolean sudahDiinisialisasi = false;
 
-    /**
-     * Dipanggil saat aplikasi pertama kali dijalankan.
-     * Inisialisasi ScreenManager dan tampilkan layar login.
-     */
     protected void startApp() throws MIDletStateChangeException {
         if (!sudahDiinisialisasi) {
-            // Inisialisasi Singleton ScreenManager
+            // Init ServiceFactory (singleton — juga init default admin)
+            ServiceFactory.getInstance();
+
+            // Seed data default jika first run
+            SeedData.run();
+
+            // Init ScreenManager dan tampilkan login
             ScreenManager sm = ScreenManager.getInstance();
             sm.init(this);
-
-            // Tampilkan layar login
             sm.tampilkanLayar(new LoginScreen());
 
             sudahDiinisialisasi = true;
         }
     }
 
-    /**
-     * Dipanggil saat aplikasi di-pause (minimize).
-     */
     protected void pauseApp() {
         // Tidak ada aksi khusus saat pause
     }
 
-    /**
-     * Dipanggil saat aplikasi ditutup.
-     * Pastikan semua resource dibebaskan.
-     */
-    protected void destroyApp(boolean unconditional) 
+    protected void destroyApp(boolean unconditional)
             throws MIDletStateChangeException {
-        // Cleanup jika diperlukan
         notifyDestroyed();
     }
 }

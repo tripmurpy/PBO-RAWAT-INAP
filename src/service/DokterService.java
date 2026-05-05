@@ -52,6 +52,24 @@ public class DokterService {
         dokterRepo.update(dokter);
     }
 
+    /** Mendapatkan dokter yang masih aktif */
+    public Vector getDokterAktif() throws Exception {
+        Vector semua = dokterRepo.findAll();
+        Vector aktif = new Vector();
+        for (int i = 0; i < semua.size(); i++) {
+            Dokter d = (Dokter) semua.elementAt(i);
+            if (d.isAktif()) aktif.addElement(d);
+        }
+        return aktif;
+    }
+
+    /** Menonaktifkan dokter (soft delete) */
+    public void nonAktifkan(String id) throws Exception {
+        Dokter d = cariById(id);
+        d.setAktif(false);
+        dokterRepo.update(d);
+    }
+
     /** Menghapus dokter */
     public void hapusDokter(int recordId) throws Exception {
         dokterRepo.delete(recordId);

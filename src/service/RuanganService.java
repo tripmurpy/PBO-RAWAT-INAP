@@ -56,6 +56,22 @@ public class RuanganService {
         ruanganRepo.updateStatus(idRuangan, Ruangan.STATUS_KOSONG, "");
     }
 
+    /** Mendapatkan ruangan yang tersedia (kosong) */
+    public Vector getRuanganTersedia() throws Exception {
+        Vector semua = ruanganRepo.findAll();
+        Vector tersedia = new Vector();
+        for (int i = 0; i < semua.size(); i++) {
+            Ruangan r = (Ruangan) semua.elementAt(i);
+            if (r.isKosong()) tersedia.addElement(r);
+        }
+        return tersedia;
+    }
+
+    /** Update data ruangan */
+    public void updateRuangan(Ruangan ruangan) throws Exception {
+        ruanganRepo.update(ruangan);
+    }
+
     /** Menghitung statistik kamar */
     public int[] hitungStatistik() throws Exception {
         Vector semua = ruanganRepo.findAll();

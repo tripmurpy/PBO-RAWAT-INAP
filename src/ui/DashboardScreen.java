@@ -4,23 +4,25 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import model.User;
+import controller.DashboardController;
 
 /**
  * DashboardScreen — Menu utama setelah login.
- * 
+ *
  * INHERITANCE: Extends Canvas.
- * Menampilkan 8 menu navigasi untuk admin.
+ * Uses DashboardController for navigation routing (5-layer architecture).
  */
 public class DashboardScreen extends Canvas {
 
     private User currentUser;
+    private DashboardController controller;
     private int selectedIndex = 0;
 
-    private static final int WARNA_BG = 0x1A1A2E;
-    private static final int WARNA_CARD = 0x16213E;
-    private static final int WARNA_TEKS = 0xFFFFFF;
-    private static final int WARNA_TEKS_REDUP = 0x888888;
-    private static final int WARNA_AKSEN = 0x533483;
+    private static final int WARNA_BG       = 0x1A1A2E;
+    private static final int WARNA_CARD     = 0x16213E;
+    private static final int WARNA_TEKS     = 0xFFFFFF;
+    private static final int WARNA_REDUP    = 0x888888;
+    private static final int WARNA_AKSEN    = 0x533483;
     private static final int WARNA_SELECTED = 0x0F3460;
 
     private static final String[] MENU = {
@@ -30,12 +32,15 @@ public class DashboardScreen extends Canvas {
         "4. Keluar Pasien (Discharge)",
         "5. Manajemen Dokter",
         "6. Manajemen Kamar",
-        "7. Riwayat Kunjungan",
-        "8. Logout"
+        "7. Manajemen Obat",
+        "8. Laporan",
+        "9. Riwayat Kunjungan",
+        "0. Logout"
     };
 
     public DashboardScreen(User user) {
         this.currentUser = user;
+        this.controller = new DashboardController();
         setFullScreenMode(true);
     }
 
@@ -51,7 +56,6 @@ public class DashboardScreen extends Canvas {
         Font fontKecil = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
         int centerX = w / 2;
-        int y = 10;
 
         // Title bar
         g.setColor(WARNA_AKSEN);
@@ -60,34 +64,32 @@ public class DashboardScreen extends Canvas {
         g.setFont(fontBesar);
         g.drawString("DASHBOARD ADMIN", centerX, 8, Graphics.TOP | Graphics.HCENTER);
 
-        // Selamat datang
-        y = 48;
-        g.setColor(WARNA_TEKS_REDUP);
+        int y = 48;
+        g.setColor(WARNA_REDUP);
         g.setFont(fontKecil);
         String nama = (currentUser != null) ? currentUser.getNamaLengkap() : "Admin";
-        g.drawString(new StringBuffer().append("Selamat datang, ").append(nama).toString(), centerX, y, Graphics.TOP | Graphics.HCENTER);
-        y += fontKecil.getHeight() + 10;
+        StringBuffer welcomeBuf = new StringBuffer();
+        welcomeBuf.append("Selamat datang, ").append(nama);
+        g.drawString(welcomeBuf.toString(), centerX, y, Graphics.TOP | Graphics.HCENTER);
+        y += fontKecil.getHeight() + 6;
 
-        // Menu items
-        int itemH = 30;
+        // Menu items (scrollable if needed)
+        int itemH = 28;
         int itemX = 10;
         int itemW = w - 20;
 
         for (int i = 0; i < MENU.length; i++) {
-            // Background item
+            if (y + itemH > h - 4) break; // clip if screen too small
             if (i == selectedIndex) {
                 g.setColor(WARNA_SELECTED);
             } else {
                 g.setColor(WARNA_CARD);
             }
             g.fillRoundRect(itemX, y, itemW, itemH, 8, 8);
-
-            // Teks menu
             g.setColor(WARNA_TEKS);
             g.setFont(fontSedang);
-            g.drawString(MENU[i], itemX + 12, y + 6, Graphics.TOP | Graphics.LEFT);
-
-            y += itemH + 5;
+            g.drawString(MENU[i], itemX + 12, y + 4, Graphics.TOP | Graphics.LEFT);
+            y += itemH + 4;
         }
     }
 
@@ -100,10 +102,11 @@ public class DashboardScreen extends Canvas {
             selectedIndex = (selectedIndex + 1) % MENU.length;
         } else if (action == Canvas.FIRE) {
             eksekusiMenu(selectedIndex);
+        } else if (keyCode == Canvas.KEY_NUM0) {
+            eksekusiMenu(9); // Logout
         } else {
-            // Shortcut angka 1-8
             int num = keyCode - Canvas.KEY_NUM1;
-            if (num >= 0 && num < MENU.length) {
+            if (num >= 0 && num < MENU.length - 1) {
                 eksekusiMenu(num);
             }
         }
@@ -112,9 +115,9 @@ public class DashboardScreen extends Canvas {
 
     protected void pointerPressed(int x, int y) {
         Font fontKecil = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL);
-        int startY = 48 + fontKecil.getHeight() + 10;
-        int itemH = 30;
-        int gap = 5;
+        int startY = 48 + fontKecil.getHeight() + 6;
+        int itemH = 28;
+        int gap = 4;
 
         for (int i = 0; i < MENU.length; i++) {
             int itemY = startY + i * (itemH + gap);
@@ -128,32 +131,17 @@ public class DashboardScreen extends Canvas {
     }
 
     private void eksekusiMenu(int index) {
-        ScreenManager sm = ScreenManager.getInstance();
         switch (index) {
-            case 0: // Daftar Pasien Baru
-                sm.tampilkanLayar(new PasienFormScreen());
-                break;
-            case 1: // Cari Pasien
-                sm.tampilkanLayar(new PasienListScreen());
-                break;
-            case 2: // Rawat Inap Baru
-                sm.tampilkanLayar(new AdmisiScreen());
-                break;
-            case 3: // Discharge
-                sm.tampilkanLayar(new DischargeScreen());
-                break;
-            case 4: // Manajemen Dokter
-                sm.tampilkanLayar(new DokterScreen());
-                break;
-            case 5: // Manajemen Kamar
-                sm.tampilkanLayar(new RuanganScreen());
-                break;
-            case 6: // Riwayat
-                sm.tampilkanLayar(new KunjunganScreen());
-                break;
-            case 7: // Logout
-                sm.logout();
-                break;
+            case 0: controller.navigatePasienBaru();  break;
+            case 1: controller.navigateCariPasien();  break;
+            case 2: controller.navigateAdmisi();      break;
+            case 3: controller.navigateDischarge();   break;
+            case 4: controller.navigateDokter();      break;
+            case 5: controller.navigateRuangan();     break;
+            case 6: controller.navigateObat();        break;
+            case 7: controller.navigateLaporan();     break;
+            case 8: controller.navigateRiwayat();     break;
+            case 9: controller.logout();              break;
         }
     }
 }

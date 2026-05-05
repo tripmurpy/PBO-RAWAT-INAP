@@ -1,0 +1,135 @@
+Buildfile: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\build.xml
+
+clean:
+   [delete] Deleting directory C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\bin
+   [delete] Deleting directory C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\preverified
+   [delete] Deleting directory C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\dist
+
+init:
+    [mkdir] Created dir: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\bin
+    [mkdir] Created dir: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\preverified
+    [mkdir] Created dir: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\dist
+
+compile:
+    [javac] Compiling 79 source files to C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\bin
+    [javac] C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\src\service\LaporanService.java:78: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+    [javac]                     countList.setElementAt(new Integer(count), idx);
+    [javac]                                            ^
+    [javac] C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\src\service\LaporanService.java:81: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+    [javac]                     countList.addElement(new Integer(1));
+    [javac]                                          ^
+    [javac] Note: Some input files use unchecked or unsafe operations.
+    [javac] Note: Recompile with -Xlint:unchecked for details.
+    [javac] 2 warnings
+
+preverify:
+
+package:
+      [jar] Building jar: C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\dist\hospital-rawat-inap.jar
+     [copy] Copying 1 file to C:\Users\ASUS\Documents\.Benny\project\.PBO-SYSTEM-RAWA-INAP\dist
+
+build:
+     [echo] Build selesai! JAR: dist/hospital-rawat-inap.jar
+
+run:
+     [exec] Running with storage root C:\Users\ASUS\j2mewtk\2.5.2\appdb\temp.DefaultColorPhone16
+     [exec] Running with locale: English_United States.1252
+     [exec] Running in the identified_third_party security domain
+     [exec] ALERT: java/lang/ClassFormatError: Bad version information.
+     [exec] Method............: 10233084 'com/sun/midp/midlet/MIDletState.createMIDlet (static)' 
+     [exec] Stack Chunk.......: c1620ac
+     [exec] Frame Pointer.....: c162104
+     [exec] Current IP........: 1033a48b = 1033a46e + offset 29
+     [exec] Previous Frame....: c1620cc
+     [exec] Previous IP.......: 103ce331 (offset 22)
+     [exec] Frame size........: 7 (1 arguments, 6 local variables)
+     [exec] Argument[0].......: c1628dc
+     [exec] Local[1]..........: 0
+     [exec] Local[2]..........: c2e07f0
+     [exec] Local[3]..........: c1720d8
+     [exec] Local[4]..........: c2e0804
+     [exec] Local[5]..........: 10274b20
+     [exec] Local[6]..........: c2e07d0
+     [exec] Operand[1]........: c1628dc
+     [exec] 
+     [exec] Method............: 10295954 'com/sun/midp/midlet/Selector.run (virtual)' 
+     [exec] Stack Chunk.......: c1620ac
+     [exec] Frame Pointer.....: c1620cc
+     [exec] Current IP........: 103ce331 = 103ce31b + offset 22
+     [exec] Previous Frame....: 0
+     [exec] Previous IP.......: 1
+     [exec] Frame size........: 6 (1 arguments, 5 local variables)
+     [exec] Argument[0].......: c162a6c
+     [exec] Local[1]..........: c1721b4
+     [exec] Local[2]..........: c1628dc
+     [exec] Local[3]..........: 0
+     [exec] Local[4]..........: 0
+     [exec] Local[5]..........: 0
+     [exec] Operand[1]........: c1721b4
+     [exec] 
+     [exec] VM status:
+     [exec] Instruction pointer.: 1033a48b (offset within invoking method: 29)
+     [exec] Next instruction....: 0x4c
+     [exec] Frame pointer.......: c162104
+     [exec] Local pointer.......: c1620e8
+     [exec] Stack size..........: 128; sp: c16211c; ranges: c1620b4-c1622b4;
+     [exec] Contents of the current stack frame:
+     [exec]     c1620e8: c1628dc (lp)
+     [exec]     c1620ec: 0
+     [exec]     c1620f0: c2e07f0
+     [exec]     c1620f4: c1720d8
+     [exec]     c1620f8: c2e0804
+     [exec]     c1620fc: 10274b20
+     [exec]     c162100: c2e07d0
+     [exec]     c162104: c1620cc (fp)
+     [exec]     c162108: 103ce331
+     [exec]     c16210c: c1620e4
+     [exec]     c162110: 10233084
+     [exec]     c162114: c1620ac
+     [exec]     c162118: 0 (end of frame)
+     [exec]     c16211c: c1628dc (sp)
+     [exec] Execution stack contains 108 items: 
+     [exec] c162a6c  
+     [exec] c1721b4  
+     [exec] c1628dc  
+     [exec] 0  
+     [exec] 0  
+     [exec] 0  
+     [exec] 0  
+     [exec] 1  
+     [exec] c2e07d4  
+     [exec] 10295954  
+     [exec] c1620ac  
+     [exec] 0  
+     [exec] c1721b4  
+     [exec] c1628dc  
+     [exec] 0  
+     [exec] c2e07f0  
+     [exec] c1720d8  
+     [exec] c2e0804  
+     [exec] 10274b20  
+     [exec] c2e07d0  
+     [exec] c1620cc  
+     [exec] 103ce331  
+     [exec] c1620e4  
+     [exec] 10233084  
+     [exec] c1620ac  
+     [exec] 0  
+     [exec] c1628dc  
+     [exec] 
+     [exec] Execution completed.
+     [exec] 3422158 bytecodes executed
+     [exec] 536 thread switches
+     [exec] 1668 classes in the system (including system classes)
+     [exec] 17729 dynamic objects allocated (530796 bytes)
+     [exec] 2 garbage collections (460448 bytes collected)
+     [exec] Execution completed.
+     [exec] 3422158 bytecodes executed
+     [exec] 536 thread switches
+     [exec] 1668 classes in the system (including system classes)
+     [exec] 17729 dynamic objects allocated (530796 bytes)
+     [exec] 2 garbage collections (460448 bytes collected)
+     [exec] Result: 127
+
+BUILD SUCCESSFUL
+Total time: 16 seconds

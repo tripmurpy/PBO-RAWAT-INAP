@@ -18,7 +18,7 @@ public class KunjunganScreen extends Form implements CommandListener {
 
     public KunjunganScreen() {
         super("RIWAYAT KUNJUNGAN");
-        this.kunjunganService = ServiceFactory.getKunjunganService();
+        this.kunjunganService = ServiceFactory.getInstance().getKunjunganService();
 
         muatRiwayat();
 

@@ -2,88 +2,49 @@ package model;
 
 /**
  * Dokter — Entitas data dokter rumah sakit.
- * 
- * ENCAPSULATION: Semua field private, akses via getter/setter.
+ *
+ * INHERITANCE: Extends Person (nama, tglLahir, jenisKelamin via Entity.id).
+ * ENCAPSULATION: Field private, akses via getter/setter.
+ * POLYMORPHISM: Override tampilkan() menampilkan spesialisasi.
  */
-public class Dokter {
+public class Dokter extends Person {
 
-    // ========== FIELD PRIVATE (ENCAPSULATION) ==========
     private int recordId;
-    private String id; // ID Dokter (DKT-XXXX)
-    private String nama; // Nama lengkap dokter
-    private String spesialisasi; // Spesialisasi (Sp.PD, Sp.A, dll)
-    private String jadwal; // Jadwal praktik (Senin-Jumat)
-    private boolean aktif; // Status aktif/tidak
-
-    // ========== KONSTRUKTOR ==========
+    private String spesialisasi;
+    private String jadwal;
+    private boolean aktif;
 
     public Dokter() {
         this.aktif = true;
     }
 
     public Dokter(String id, String nama, String spesialisasi, String jadwal) {
-        this.id = id;
-        this.nama = nama;
+        super(id, nama, 0L, "L");
         this.spesialisasi = spesialisasi;
         this.jadwal = jadwal;
         this.aktif = true;
     }
 
-    // ========== GETTER (ENCAPSULATION) ==========
+    public int getRecordId() { return recordId; }
+    public String getSpesialisasi() { return spesialisasi; }
+    public String getJadwal() { return jadwal; }
+    public boolean isAktif() { return aktif; }
 
-    public int getRecordId() {
-        return recordId;
+    public void setRecordId(int recordId) { this.recordId = recordId; }
+    public void setSpesialisasi(String spesialisasi) { this.spesialisasi = spesialisasi; }
+    public void setJadwal(String jadwal) { this.jadwal = jadwal; }
+    public void setAktif(boolean aktif) { this.aktif = aktif; }
+
+    /** POLYMORPHISM: Override tampilkan() dengan spesialisasi. */
+    public String tampilkan() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("dr. ").append(nama).append(" - Sp.").append(spesialisasi);
+        return sb.toString();
     }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getNama() {
-        return nama;
-    }
-
-    public String getSpesialisasi() {
-        return spesialisasi;
-    }
-
-    public String getJadwal() {
-        return jadwal;
-    }
-
-    public boolean isAktif() {
-        return aktif;
-    }
-
-    // ========== SETTER (ENCAPSULATION) ==========
-
-    public void setRecordId(int recordId) {
-        this.recordId = recordId;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setNama(String nama) {
-        this.nama = nama;
-    }
-
-    public void setSpesialisasi(String spesialisasi) {
-        this.spesialisasi = spesialisasi;
-    }
-
-    public void setJadwal(String jadwal) {
-        this.jadwal = jadwal;
-    }
-
-    public void setAktif(boolean aktif) {
-        this.aktif = aktif;
-    }
-
-    // ========== TO STRING ==========
 
     public String toString() {
-        return nama + " (" + spesialisasi + ")";
+        StringBuffer sb = new StringBuffer();
+        sb.append(nama).append(" (").append(spesialisasi).append(")");
+        return sb.toString();
     }
 }

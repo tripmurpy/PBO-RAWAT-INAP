@@ -4,9 +4,8 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Displayable;
-import service.AuthService;
 import model.User;
-import util.ServiceFactory;
+import controller.LoginController;
 
 /**
  * LoginScreen — Layar login admin.
@@ -16,9 +15,9 @@ import util.ServiceFactory;
  */
 public class LoginScreen extends Canvas {
 
-    private AuthService authService;
-    private String username = "";
-    private String password = "";
+    private LoginController loginController;
+    private StringBuffer username = new StringBuffer();
+    private StringBuffer password = new StringBuffer();
     private int fieldAktif = 0; // 0=username, 1=password, 2=login button
     private String pesanError = "";
     private boolean sedangInput = false;
@@ -42,7 +41,7 @@ public class LoginScreen extends Canvas {
     private static final int WARNA_SELECTED = 0x0F3460;
 
     public LoginScreen() {
-        this.authService = ServiceFactory.getInstance().getAuthService();
+        this.loginController = new LoginController();
         setFullScreenMode(true);
     }
 
@@ -98,7 +97,7 @@ public class LoginScreen extends Canvas {
         g.fillRoundRect(fieldX, usernameFieldY, fieldW, fieldH, 6, 6);
         g.setColor(WARNA_TEKS);
         g.setFont(fontSedang);
-        g.drawString(username.length() > 0 ? username : "",
+        g.drawString(username.length() > 0 ? username.toString() : "",
                 fieldX + 8, usernameFieldY + 4, Graphics.TOP | Graphics.LEFT);
         fy += fieldH + 10;
 
@@ -162,9 +161,9 @@ public class LoginScreen extends Canvas {
         } else if (keyCode == KEY_STAR || keyCode == -8) {
             // Hapus karakter terakhir
             if (fieldAktif == 0 && username.length() > 0) {
-                username = username.substring(0, username.length() - 1);
+                username.deleteCharAt(username.length() - 1);
             } else if (fieldAktif == 1 && password.length() > 0) {
-                password = password.substring(0, password.length() - 1);
+                password.deleteCharAt(password.length() - 1);
             }
         } else if (keyCode >= KEY_NUM0 && keyCode <= KEY_NUM9) {
             if (fieldAktif == 2 && keyCode == KEY_NUM5) {
@@ -174,9 +173,9 @@ public class LoginScreen extends Canvas {
                 char c = mapKeyToChar(keyCode);
                 if (c != 0) {
                     if (fieldAktif == 0) {
-                        username += c;
+                        username.append(c);
                     } else {
-                        password += c;
+                        password.append(c);
                     }
                 }
             }
@@ -206,7 +205,7 @@ public class LoginScreen extends Canvas {
 
     private void prosesLogin() {
         try {
-            User user = authService.login(username, password);
+            User user = loginController.login(username.toString(), password.toString());
             pesanError = "";
             // Navigasi ke Dashboard
             ScreenManager.getInstance().tampilkanLayar(new DashboardScreen(user));

@@ -44,6 +44,8 @@ public class Penyakit {
     // ========== TO STRING ==========
 
     public String toString() {
-        return kodeICD10 + " - " + namaPenyakit;
+        StringBuffer sb = new StringBuffer();
+        sb.append(kodeICD10).append(" - ").append(namaPenyakit);
+        return sb.toString();
     }
 }
