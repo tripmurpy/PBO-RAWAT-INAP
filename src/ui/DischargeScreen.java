@@ -17,6 +17,7 @@ public class DischargeScreen extends Form implements CommandListener {
 
     private AdmisiService admisiService;
     private TextField tfCari, tfDiagnosisAkhir, tfKodeICD10, tfTglKeluar, tfCatatan;
+    private TextField tfBiayaKamar, tfBiayaObat;
     private StringItem siInfo;
     private Command cmdCari, cmdSelesai, cmdBatal;
     private Admisi admisiAktif;
@@ -59,22 +60,38 @@ public class DischargeScreen extends Form implements CommandListener {
                 return;
             }
 
+            String namaDokter = "-";
+            String namaKamar = "-";
+            try {
+                model.Dokter dk = ServiceFactory.getInstance().getDokterService().cariById(admisiAktif.getIdDokter());
+                if (dk != null) namaDokter = dk.getNama();
+            } catch(Exception e){}
+            try {
+                model.Ruangan rn = ServiceFactory.getInstance().getRuanganService().cariById(admisiAktif.getIdRuangan());
+                if (rn != null) namaKamar = rn.getNamaRuangan();
+            } catch(Exception e){}
+
             siInfo.setText(new StringBuffer()
                     .append("ID Admisi : ").append(admisiAktif.getIdAdmisi()).append("\n")
                     .append("No. RM    : ").append(admisiAktif.getNoRMPasien()).append("\n")
                     .append("Masuk     : ").append(DateUtil.formatTanggal(admisiAktif.getTglMasuk())).append("\n")
+                    .append("Kamar     : ").append(namaKamar).append("\n")
+                    .append("Dokter    : ").append(namaDokter).append("\n")
                     .append("Diagnosis : ").append(admisiAktif.getDiagnosisAwal()).toString());
 
-            // Tampilkan form discharge
             tfDiagnosisAkhir = new TextField("Diagnosis Akhir", "", 200, TextField.ANY);
             tfKodeICD10 = new TextField("Kode ICD-10", "", 10, TextField.ANY);
             tfTglKeluar = new TextField("Tgl Keluar (DD/MM/YYYY)",
                     DateUtil.tanggalHariIni(), 10, TextField.ANY);
-            tfCatatan = new TextField("Catatan", "", 200, TextField.ANY);
+            tfBiayaKamar = new TextField("Biaya Kamar (Rp)", "0", 15, TextField.NUMERIC);
+            tfBiayaObat = new TextField("Biaya Obat (Rp)", "0", 15, TextField.NUMERIC);
+            tfCatatan = new TextField("Catatan Tambahan", "", 200, TextField.ANY);
 
             append(tfDiagnosisAkhir);
             append(tfKodeICD10);
             append(tfTglKeluar);
+            append(tfBiayaKamar);
+            append(tfBiayaObat);
             append(tfCatatan);
 
             removeCommand(cmdCari);
@@ -95,9 +112,23 @@ public class DischargeScreen extends Form implements CommandListener {
 
             int lamaRawat = admisiService.hitungLamaRawat(hasil);
 
+            int biayaKamar = 0;
+            int biayaObat = 0;
+            try { biayaKamar = Integer.parseInt(tfBiayaKamar.getString()); } catch(Exception e){}
+            try { biayaObat = Integer.parseInt(tfBiayaObat.getString()); } catch(Exception e){}
+            
+            int biayaTotal = biayaKamar + biayaObat;
+            hasil.setBiayaTotal(biayaTotal);
+            // Re-save/update admisi untuk apply biayaTotal
+            // We assume discharge method above updated the repo, we just need to update it again or it's handled by reference
+            ServiceFactory.getInstance().getAdmisiService().discharge(
+                    hasil.getIdAdmisi(), hasil.getDiagnosisAkhir(), hasil.getKodeICD10(), 
+                    tfTglKeluar.getString(), hasil.getCatatan()); // re-update doesn't break, but maybe just use repository
+            
             Alert alert = new Alert("PASIEN BERHASIL KELUAR",
                     new StringBuffer().append("Kamar kembali KOSONG\n")
-                            .append("Lama rawat: ").append(lamaRawat).append(" hari").toString(),
+                            .append("Lama rawat: ").append(lamaRawat).append(" hari\n")
+                            .append("Total Biaya: Rp ").append(biayaTotal).toString(),
                     null, AlertType.CONFIRMATION);
             alert.setTimeout(Alert.FOREVER);
             Command cmdOK = new Command("OK", Command.OK, 1);

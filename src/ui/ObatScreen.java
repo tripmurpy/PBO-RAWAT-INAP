@@ -20,14 +20,15 @@ public class ObatScreen extends Canvas {
     private String pesanError = "";
     private static final int MAX_VISIBLE = 6;
 
-    private static final int WARNA_BG       = 0x1A1A2E;
-    private static final int WARNA_HEADER   = 0x533483;
-    private static final int WARNA_CARD     = 0x16213E;
-    private static final int WARNA_SELECTED = 0x0F3460;
-    private static final int WARNA_TEKS     = 0xFFFFFF;
-    private static final int WARNA_REDUP    = 0x888888;
-    private static final int WARNA_WARNING  = 0xE94560;
-    private static final int WARNA_OK       = 0x27AE60;
+    private static final int WARNA_BG = 0xF0F4F8;
+    private static final int WARNA_HEADER = 0x4A90E2;
+    private static final int WARNA_CARD = 0xFFFFFF;
+    private static final int WARNA_SELECTED = 0xD0E1F9;
+    private static final int WARNA_TEKS = 0x333333;
+    private static final int WARNA_TEKS_TERANG = 0xFFFFFF;
+    private static final int WARNA_REDUP = 0x888888;
+    private static final int WARNA_WARNING = 0xE94560;
+    private static final int WARNA_OK = 0x27AE60;
 
     public ObatScreen() {
         controller = new ObatController();
@@ -61,7 +62,7 @@ public class ObatScreen extends Canvas {
         // Header
         g.setColor(WARNA_HEADER);
         g.fillRect(0, 0, w, 36);
-        g.setColor(WARNA_TEKS);
+        g.setColor(WARNA_TEKS_TERANG);
         g.setFont(fBesar);
         g.drawString("MANAJEMEN OBAT", cx, 6, Graphics.TOP | Graphics.HCENTER);
 
@@ -140,8 +141,11 @@ public class ObatScreen extends Canvas {
                 if (selectedIndex >= scrollOffset + MAX_VISIBLE)
                     scrollOffset = selectedIndex - MAX_VISIBLE + 1;
             }
-        } else if (action == FIRE) {
-            // Detail / edit obat yang dipilih (future feature)
+        } else if (action == FIRE || keyCode == KEY_NUM5) {
+            if (listObat != null && selectedIndex >= 0 && selectedIndex < listObat.size()) {
+                Obat selectedObat = (Obat) listObat.elementAt(selectedIndex);
+                ScreenManager.getInstance().getDisplay().setCurrent(new ObatPemberianScreen(selectedObat));
+            }
         } else if (keyCode == KEY_NUM0 || keyCode == -2) {
             ScreenManager.getInstance().kembali();
             return;

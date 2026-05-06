@@ -3,6 +3,8 @@ package ui;
 import javax.microedition.lcdui.*;
 import service.PasienService;
 import model.Pasien;
+import java.util.Date;
+import util.DateUtil;
 import util.ServiceFactory;
 
 /**
@@ -13,7 +15,8 @@ import util.ServiceFactory;
 public class PasienFormScreen extends Form implements CommandListener {
 
     private PasienService service;
-    private TextField tfNama, tfTglLahir, tfAlamat, tfNoTelp;
+    private TextField tfNama, tfAlamat, tfNoTelp;
+    private DateField dfTglLahir;
     private ChoiceGroup cgJenisKelamin, cgAsuransi;
     private Command cmdDaftar, cmdBatal;
 
@@ -23,7 +26,8 @@ public class PasienFormScreen extends Form implements CommandListener {
 
         // Input fields
         tfNama = new TextField("Nama Lengkap", "", 100, TextField.ANY);
-        tfTglLahir = new TextField("Tgl Lahir (DD/MM/YYYY)", "", 10, TextField.ANY);
+        dfTglLahir = new DateField("Tgl Lahir", DateField.DATE);
+        dfTglLahir.setDate(new Date());
         cgJenisKelamin = new ChoiceGroup("Jenis Kelamin", ChoiceGroup.EXCLUSIVE);
         cgJenisKelamin.append("Laki-laki (L)", null);
         cgJenisKelamin.append("Perempuan (P)", null);
@@ -31,11 +35,11 @@ public class PasienFormScreen extends Form implements CommandListener {
         tfNoTelp = new TextField("No. Telepon", "", 15, TextField.PHONENUMBER);
         cgAsuransi = new ChoiceGroup("Asuransi", ChoiceGroup.EXCLUSIVE);
         cgAsuransi.append("BPJS", null);
-        cgAsuransi.append("Mandiri", null);
-        cgAsuransi.append("Swasta", null);
+        cgAsuransi.append("Asuransi Kesehatan Eka Hospital", null);
+        cgAsuransi.append("Asuransi Swasta", null);
 
         append(tfNama);
-        append(tfTglLahir);
+        append(dfTglLahir);
         append(cgJenisKelamin);
         append(tfAlamat);
         append(tfNoTelp);
@@ -60,12 +64,14 @@ public class PasienFormScreen extends Form implements CommandListener {
     private void prosesDaftar() {
         try {
             String jk = (cgJenisKelamin.getSelectedIndex() == 0) ? "L" : "P";
-            String[] asuransiArr = {"BPJS", "Mandiri", "Swasta"};
+            String[] asuransiArr = {"BPJS", "Asuransi Kesehatan Eka Hospital", "Asuransi Swasta"};
             String asuransi = asuransiArr[cgAsuransi.getSelectedIndex()];
+            Date d = dfTglLahir.getDate();
+            String tglLahirStr = (d != null) ? DateUtil.formatTanggal(d.getTime()) : "";
 
             Pasien pasien = service.daftarPasienBaru(
                 tfNama.getString(),
-                tfTglLahir.getString(),
+                tglLahirStr,
                 jk,
                 tfAlamat.getString(),
                 tfNoTelp.getString(),

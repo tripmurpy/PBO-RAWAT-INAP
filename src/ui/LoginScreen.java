@@ -38,16 +38,17 @@ public class LoginScreen extends Canvas {
     private int btnY, btnH;
 
     // Konstanta warna
-    private static final int WARNA_BG = 0x1A1A2E;
-    private static final int WARNA_CARD = 0x16213E;
-    private static final int WARNA_AKSEN = 0x0F3460;
-    private static final int WARNA_TEKS = 0xFFFFFF;
+    private static final int WARNA_BG = 0xF0F4F8;
+    private static final int WARNA_CARD = 0xFFFFFF;
+    private static final int WARNA_AKSEN = 0x4A90E2;
+    private static final int WARNA_TEKS = 0x333333;
+    private static final int WARNA_TEKS_TERANG = 0xFFFFFF;
     private static final int WARNA_TEKS_REDUP = 0x888888;
     private static final int WARNA_ERROR = 0xE94560;
-    private static final int WARNA_TOMBOL = 0x533483;
-    private static final int WARNA_FIELD_BG = 0x0A0A1A;
-    private static final int WARNA_FIELD_AKTIF = 0x0F3460;
-    private static final int WARNA_SELECTED = 0x0F3460;
+    private static final int WARNA_TOMBOL = 0x4A90E2;
+    private static final int WARNA_FIELD_BG = 0xE8EEF2;
+    private static final int WARNA_FIELD_AKTIF = 0xD0E1F9;
+    private static final int WARNA_SELECTED = 0x357ABD;
 
     public LoginScreen() {
         this.loginController = new LoginController();
@@ -141,7 +142,7 @@ public class LoginScreen extends Canvas {
             g.drawRoundRect(fieldX, btnY, fieldW, btnH, 8, 8);
         }
 
-        g.setColor(WARNA_TEKS);
+        g.setColor(WARNA_TEKS_TERANG);
         g.setFont(fontBesar);
         g.drawString("LOGIN", centerX, btnY + 6, Graphics.TOP | Graphics.HCENTER);
 

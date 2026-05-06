@@ -32,7 +32,8 @@ public class LaporanScreen extends Canvas {
         "2. Stok Obat",
         "3. Pasien Aktif (Dirawat)",
         "4. Top 5 Diagnosa",
-        "5. Kembali"
+        "5. Billing & Laporan Pasien",
+        "6. Kembali"
     };
 
     private static final int WARNA_BG       = 0x1A1A2E;
@@ -212,6 +213,9 @@ public class LaporanScreen extends Canvas {
                     mode = MODE_DIAGNOSA;
                     break;
                 case 4:
+                    ScreenManager.getInstance().tampilkanLayar(new BillingScreen());
+                    return;
+                case 5:
                     ScreenManager.getInstance().kembali();
                     return;
             }

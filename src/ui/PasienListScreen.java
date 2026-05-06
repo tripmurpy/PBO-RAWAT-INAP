@@ -21,13 +21,15 @@ public class PasienListScreen extends Canvas implements CommandListener {
 
     private Command cmdHapus, cmdKembali;
 
-    private static final int WARNA_BG = 0x1A1A2E;
-    private static final int WARNA_CARD = 0x16213E;
-    private static final int WARNA_TEKS = 0xFFFFFF;
+    private static final int WARNA_BG = 0xF0F4F8;
+    private static final int WARNA_CARD = 0xFFFFFF;
+    private static final int WARNA_TEKS = 0x333333;
+    private static final int WARNA_TEKS_TERANG = 0xFFFFFF;
     private static final int WARNA_TEKS_REDUP = 0x888888;
-    private static final int WARNA_AKSEN = 0x533483;
-    private static final int WARNA_SELECTED = 0x0F3460;
+    private static final int WARNA_AKSEN = 0x4A90E2;
+    private static final int WARNA_SELECTED = 0xD0E1F9;
     private static final int WARNA_HAPUS = 0xE94560;
+    private static final int WARNA_QUEUE = 0x27AE60; // Bright green for queue number
 
     public PasienListScreen() {
         this.service = ServiceFactory.getInstance().getPasienService();
@@ -74,9 +76,9 @@ public class PasienListScreen extends Canvas implements CommandListener {
         // Title bar
         g.setColor(WARNA_AKSEN);
         g.fillRect(0, 0, w, 40);
-        g.setColor(WARNA_TEKS);
+        g.setColor(WARNA_TEKS_TERANG);
         g.setFont(fontBesar);
-        g.drawString("DAFTAR PASIEN", w / 2, 8, Graphics.TOP | Graphics.HCENTER);
+        g.drawString("ANTRIAN PASIEN", w / 2, 8, Graphics.TOP | Graphics.HCENTER);
 
         int y = 50;
 
@@ -95,7 +97,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
             y += fontKecil.getHeight() + 8;
 
             // List pasien
-            int itemH = 45;
+            int itemH = 60; // Taller for queue card
             int maxVisible = (h - y - 30) / (itemH + 4);
 
             for (int i = scrollOffset; i < daftarPasien.size() &&
@@ -105,28 +107,43 @@ public class PasienListScreen extends Canvas implements CommandListener {
                 g.setColor(i == selectedIndex ? WARNA_SELECTED : WARNA_CARD);
                 g.fillRoundRect(10, y, w - 20, itemH, 8, 8);
 
+                // Draw Queue Number Box
+                g.setColor(WARNA_QUEUE);
+                g.fillRoundRect(10, y, 50, itemH, 8, 8);
+                // Fix right corners of queue box to connect with card
+                g.fillRect(50, y, 10, itemH);
+                
+                g.setColor(WARNA_TEKS_TERANG);
+                g.setFont(fontBesar);
+                String qNum = (i < 9) ? "A0" + (i + 1) : "A" + (i + 1);
+                g.drawString(qNum, 35, y + (itemH - fontBesar.getHeight()) / 2, Graphics.TOP | Graphics.HCENTER);
+
+                // Draw Patient Info
                 g.setColor(WARNA_TEKS);
                 g.setFont(fontSedang);
-                g.drawString(p.getNama(), 20, y + 4, Graphics.TOP | Graphics.LEFT);
+                g.drawString(p.getNama(), 70, y + 4, Graphics.TOP | Graphics.LEFT);
 
                 g.setColor(WARNA_TEKS_REDUP);
                 g.setFont(fontKecil);
-                g.drawString(new StringBuffer().append(p.getNoRM()).append(" | ").append(p.getAsuransi()).toString(),
-                        20, y + 4 + fontSedang.getHeight(),
-                        Graphics.TOP | Graphics.LEFT);
+                g.drawString(new StringBuffer().append("Telp: ").append(p.getNoTelp()).toString(),
+                        70, y + 4 + fontSedang.getHeight(), Graphics.TOP | Graphics.LEFT);
+                        
+                // Info Dokter/Ruangan (Mockup)
+                g.setColor(WARNA_AKSEN);
+                g.drawString("Dokter: Belum | R. Poli",
+                        70, y + 6 + fontSedang.getHeight() + fontKecil.getHeight(), Graphics.TOP | Graphics.LEFT);
 
-                // Tombol Hapus di kanan card
-                int btnHapusW = 50;
-                int btnHapusH = 25;
-                int btnHapusX = w - 10 - btnHapusW - 5;
-                int btnHapusY = y + (itemH - btnHapusH) / 2;
+                // Tombol Set Dokter di kanan
+                int btnW = 55;
+                int btnH = 25;
+                int btnX = w - 10 - btnW - 5;
+                int btnYPos = y + (itemH - btnH) / 2;
 
-                g.setColor(WARNA_HAPUS);
-                g.fillRoundRect(btnHapusX, btnHapusY, btnHapusW, btnHapusH, 6, 6);
-                g.setColor(WARNA_TEKS);
+                g.setColor(WARNA_AKSEN);
+                g.fillRoundRect(btnX, btnYPos, btnW, btnH, 6, 6);
+                g.setColor(WARNA_TEKS_TERANG);
                 g.setFont(fontKecil);
-                g.drawString("HAPUS", btnHapusX + btnHapusW / 2, btnHapusY + 5,
-                        Graphics.TOP | Graphics.HCENTER);
+                g.drawString("DOKTER", btnX + btnW / 2, btnYPos + 5, Graphics.TOP | Graphics.HCENTER);
 
                 y += itemH + 4;
             }
@@ -137,7 +154,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
         g.fillRect(0, h - 25, w, 25);
         g.setColor(WARNA_TEKS_REDUP);
         g.setFont(fontKecil);
-        g.drawString("Pilih item & tekan OK untuk Hapus", 10, h - 20, Graphics.TOP | Graphics.LEFT);
+        g.drawString("Pilih item & tekan OK untuk Assign Dokter", 10, h - 20, Graphics.TOP | Graphics.LEFT);
     }
 
     protected void keyPressed(int keyCode) {
@@ -161,7 +178,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
             ScreenManager.getInstance().kembali();
         } else if (action == Canvas.FIRE || keyCode == Canvas.KEY_NUM5) {
             if (daftarPasien != null && selectedIndex >= 0 && selectedIndex < daftarPasien.size()) {
-                konfirmasiHapus((Pasien) daftarPasien.elementAt(selectedIndex));
+                bukaFormDokter((Pasien) daftarPasien.elementAt(selectedIndex));
             }
         }
         repaint();
@@ -185,10 +202,10 @@ public class PasienListScreen extends Canvas implements CommandListener {
                 if (y >= itemY && y <= itemY + itemH) {
                     selectedIndex = i;
 
-                    // Hit area tombol HAPUS lebih lebar (seluruh sisi kanan item)
+                    // Hit area tombol DOKTER lebih lebar (seluruh sisi kanan item)
                     int triggerX = w - 70; // Lebih lebar dari visual tombol
                     if (x >= triggerX) {
-                        konfirmasiHapus((Pasien) daftarPasien.elementAt(i));
+                        bukaFormDokter((Pasien) daftarPasien.elementAt(i));
                     }
 
                     repaint();
@@ -196,6 +213,38 @@ public class PasienListScreen extends Canvas implements CommandListener {
                 }
             }
         }
+    }
+
+    private void bukaFormDokter(final Pasien p) {
+        final Form form = new Form("Assign Dokter - " + p.getNama());
+        final ChoiceGroup cgDokter = new ChoiceGroup("Pilih Dokter", ChoiceGroup.EXCLUSIVE);
+        
+        try {
+            java.util.Vector listDokter = ServiceFactory.getInstance().getDokterService().getSemuaDokter();
+            for (int i = 0; i < listDokter.size(); i++) {
+                model.Dokter dk = (model.Dokter) listDokter.elementAt(i);
+                cgDokter.append(dk.getNama() + " (" + dk.getSpesialisasi() + ")", null);
+            }
+        } catch (Exception e) {}
+        
+        form.append(cgDokter);
+        
+        final Command cmdSimpan = new Command("Simpan", Command.OK, 1);
+        final Command cmdBatalDokter = new Command("Batal", Command.BACK, 2);
+        form.addCommand(cmdSimpan);
+        form.addCommand(cmdBatalDokter);
+        form.setCommandListener(new CommandListener() {
+            public void commandAction(Command c, Displayable d) {
+                if (c == cmdSimpan) {
+                    // Implementasi simpan (mockup visual)
+                    ScreenManager.getInstance().getDisplay().setCurrent(PasienListScreen.this);
+                } else if (c == cmdBatalDokter) {
+                    ScreenManager.getInstance().getDisplay().setCurrent(PasienListScreen.this);
+                }
+            }
+        });
+        
+        ScreenManager.getInstance().getDisplay().setCurrent(form);
     }
 
     private void konfirmasiHapus(final Pasien p) {

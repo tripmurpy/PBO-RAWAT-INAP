@@ -2,166 +2,195 @@ package ui;
 
 import javax.microedition.lcdui.*;
 import java.util.Vector;
-import service.AdmisiService;
-import service.PasienService;
-import service.DokterService;
-import service.RuanganService;
+import model.Admisi;
 import model.Pasien;
 import model.Dokter;
 import model.Ruangan;
-import model.Admisi;
-import util.DateUtil;
+import service.AdmisiService;
 import util.ServiceFactory;
+import util.DateUtil;
 
 /**
- * AdmisiScreen — Form rawat inap baru.
- * INHERITANCE: Extends Form.
+ * AdmisiScreen — Menampilkan daftar pasien rawat inap.
+ * INHERITANCE: Extends Canvas.
  */
-public class AdmisiScreen extends Form implements CommandListener {
+public class AdmisiScreen extends Canvas implements CommandListener {
 
-    private AdmisiService admisiService;
-    private PasienService pasienService;
-    private DokterService dokterService;
-    private RuanganService ruanganService;
+    private AdmisiService service;
+    private Vector daftarAdmisiDetail;
+    private int selectedIndex = 0;
+    private int scrollOffset = 0;
 
-    private TextField tfNoRM, tfDiagnosis, tfTglMasuk;
-    private ChoiceGroup cgDokter, cgRuangan;
-    private StringItem siPasienInfo;
-    private Command cmdCari, cmdProses, cmdBatal;
+    private Command cmdKembali, cmdBaru;
 
-    private Pasien pasienDitemukan;
-    private Vector listDokter, listRuangan;
+    private static final int WARNA_BG = 0xF0F4F8;
+    private static final int WARNA_CARD = 0xFFFFFF;
+    private static final int WARNA_TEKS = 0x333333;
+    private static final int WARNA_TEKS_TERANG = 0xFFFFFF;
+    private static final int WARNA_TEKS_REDUP = 0x888888;
+    private static final int WARNA_AKSEN = 0x4A90E2;
+    private static final int WARNA_SELECTED = 0xD0E1F9;
+    private static final int WARNA_INFO = 0x16A085;
+
+    private class AdmisiDetail {
+        String namaPasien;
+        String noRM;
+        String jk;
+        String tlp;
+        String tglMasuk;
+        String kamar;
+        String dokter;
+        String noAntrian;
+    }
 
     public AdmisiScreen() {
-        super("RAWAT INAP BARU");
-        ServiceFactory sf = ServiceFactory.getInstance();
-        this.admisiService = sf.getAdmisiService();
-        this.pasienService = sf.getPasienService();
-        this.dokterService = sf.getDokterService();
-        this.ruanganService = sf.getRuanganService();
+        this.service = ServiceFactory.getInstance().getAdmisiService();
+        setFullScreenMode(true);
+        daftarAdmisiDetail = new Vector();
+        muatData();
 
-        tfNoRM = new TextField("No. RM Pasien", "", 20, TextField.ANY);
-        siPasienInfo = new StringItem("Info Pasien", "Belum dicari");
-
-        append(tfNoRM);
-        append(siPasienInfo);
-
-        cmdCari = new Command("Cari Pasien", Command.OK, 1);
-        cmdProses = new Command("Proses Admisi", Command.OK, 2);
-        cmdBatal = new Command("Batal", Command.BACK, 3);
-        addCommand(cmdCari);
-        addCommand(cmdBatal);
+        cmdKembali = new Command("Kembali", Command.BACK, 1);
+        cmdBaru = new Command("Baru", Command.ITEM, 2);
+        addCommand(cmdKembali);
+        addCommand(cmdBaru);
         setCommandListener(this);
     }
 
+    private void muatData() {
+        daftarAdmisiDetail.removeAllElements();
+        try {
+            Vector admisiList = service.getAdmisiAktif();
+            for (int i = 0; i < admisiList.size(); i++) {
+                Admisi a = (Admisi) admisiList.elementAt(i);
+                AdmisiDetail ad = new AdmisiDetail();
+                
+                Pasien p = null;
+                Dokter dk = null;
+                Ruangan rn = null;
+                try {
+                    p = ServiceFactory.getInstance().getPasienService().cariByRM(a.getNoRM());
+                    dk = ServiceFactory.getInstance().getDokterService().cariById(a.getIdDokter());
+                    rn = ServiceFactory.getInstance().getRuanganService().cariById(a.getIdRuangan());
+                } catch (Exception ex) {}
+
+                ad.noAntrian = "INP-" + (i < 9 ? "0" + (i+1) : String.valueOf(i+1));
+                ad.namaPasien = p != null ? p.getNama() : "Unknown";
+                ad.noRM = p != null ? p.getNoRM() : a.getNoRM();
+                ad.jk = p != null ? p.getJenisKelamin() : "-";
+                ad.tlp = p != null ? p.getNoTelp() : "-";
+                ad.kamar = rn != null ? rn.getNamaRuangan() + " (" + rn.getTipeKamar() + ")" : "-";
+                ad.dokter = dk != null ? dk.getNama() : "-";
+                ad.tglMasuk = DateUtil.formatTanggal(a.getTglMasuk());
+
+                daftarAdmisiDetail.addElement(ad);
+            }
+        } catch (Exception e) {}
+    }
+
     public void commandAction(Command c, Displayable d) {
-        if (c == cmdBatal) {
+        if (c == cmdKembali) {
             ScreenManager.getInstance().kembali();
-        } else if (c == cmdCari) {
-            cariPasien();
-        } else if (c == cmdProses) {
-            prosesAdmisi();
+        } else if (c == cmdBaru) {
+            ScreenManager.getInstance().tampilkanLayar(new AdmisiBaruScreen());
         }
     }
 
-    private void cariPasien() {
-        try {
-            pasienDitemukan = pasienService.cariByRM(tfNoRM.getString().trim());
-            StringBuffer sb = new StringBuffer();
-            sb.append("Nama    : ").append(pasienDitemukan.getNama()).append("\n");
-            sb.append("Tgl Lhr : ").append(DateUtil.formatTanggal(pasienDitemukan.getTglLahir())).append("\n");
-            sb.append("Asuransi: ").append(pasienDitemukan.getAsuransi());
-            siPasienInfo.setText(sb.toString());
+    protected void paint(Graphics g) {
+        int w = getWidth();
+        int h = getHeight();
 
-            // Tampilkan form lengkap admisi
-            tampilkanFormAdmisi();
-        } catch (Exception e) {
-            siPasienInfo.setText(new StringBuffer().append("Error: ").append(e.getMessage()).toString());
+        g.setColor(WARNA_BG);
+        g.fillRect(0, 0, w, h);
+
+        Font fontBesar = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE);
+        Font fontSedang = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
+        Font fontKecil = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL);
+
+        // Title bar
+        g.setColor(WARNA_AKSEN);
+        g.fillRect(0, 0, w, 40);
+        g.setColor(WARNA_TEKS_TERANG);
+        g.setFont(fontBesar);
+        g.drawString("PASIEN RAWAT INAP", w / 2, 8, Graphics.TOP | Graphics.HCENTER);
+
+        int y = 50;
+
+        if (daftarAdmisiDetail.size() == 0) {
+            g.setColor(WARNA_TEKS_REDUP);
+            g.setFont(fontSedang);
+            g.drawString("Tidak ada pasien dirawat", w / 2, h / 2, Graphics.TOP | Graphics.HCENTER);
+        } else {
+            g.setColor(WARNA_TEKS_REDUP);
+            g.setFont(fontKecil);
+            g.drawString("Total: " + daftarAdmisiDetail.size() + " pasien", 10, y, Graphics.TOP | Graphics.LEFT);
+            y += fontKecil.getHeight() + 8;
+
+            int itemH = 115; // Tall enough for all data
+            int maxVisible = (h - y - 30) / (itemH + 4);
+
+            for (int i = scrollOffset; i < daftarAdmisiDetail.size() && i < scrollOffset + maxVisible; i++) {
+                AdmisiDetail ad = (AdmisiDetail) daftarAdmisiDetail.elementAt(i);
+
+                g.setColor(i == selectedIndex ? WARNA_SELECTED : WARNA_CARD);
+                g.fillRoundRect(10, y, w - 20, itemH, 8, 8);
+
+                // Queue Box / Tag
+                g.setColor(WARNA_INFO);
+                g.fillRoundRect(10, y, 65, itemH, 8, 8);
+                g.fillRect(65, y, 10, itemH); // square off right side
+                
+                g.setColor(WARNA_TEKS_TERANG);
+                g.setFont(fontSedang);
+                g.drawString(ad.noAntrian, 40, y + (itemH - fontSedang.getHeight())/2, Graphics.TOP | Graphics.HCENTER);
+
+                // Info Pasien
+                int startX = 85;
+                g.setColor(WARNA_TEKS);
+                g.setFont(fontBesar);
+                g.drawString(ad.namaPasien + " (" + ad.jk + ")", startX, y + 5, Graphics.TOP | Graphics.LEFT);
+
+                int textY = y + 5 + fontBesar.getHeight() + 4;
+
+                g.setColor(WARNA_TEKS_REDUP);
+                g.setFont(fontKecil);
+                g.drawString("RM: " + ad.noRM + " | Telp: " + ad.tlp, startX, textY, Graphics.TOP | Graphics.LEFT);
+                textY += fontKecil.getHeight() + 2;
+
+                g.drawString("Tgl Masuk: " + ad.tglMasuk, startX, textY, Graphics.TOP | Graphics.LEFT);
+                textY += fontKecil.getHeight() + 2;
+
+                g.setColor(WARNA_INFO);
+                g.drawString("Kamar: " + ad.kamar, startX, textY, Graphics.TOP | Graphics.LEFT);
+                textY += fontKecil.getHeight() + 2;
+                
+                g.setColor(WARNA_AKSEN);
+                g.drawString("Dokter Jaga: " + ad.dokter, startX, textY, Graphics.TOP | Graphics.LEFT);
+
+                y += itemH + 4;
+            }
         }
+        
+        // Footer (Label bantuan)
+        g.setColor(WARNA_CARD);
+        g.fillRect(0, h - 25, w, 25);
+        g.setColor(WARNA_TEKS_REDUP);
+        g.setFont(fontKecil);
+        g.drawString("Pilih menu 'Baru' untuk mendaftarkan admisi", 10, h - 20, Graphics.TOP | Graphics.LEFT);
     }
 
-    private void tampilkanFormAdmisi() {
-        try {
-            // Dokter
-            cgDokter = new ChoiceGroup("Dokter PJ", ChoiceGroup.EXCLUSIVE);
-            listDokter = dokterService.getSemuaDokter();
-            for (int i = 0; i < listDokter.size(); i++) {
-                Dokter dk = (Dokter) listDokter.elementAt(i);
-                StringBuffer sb = new StringBuffer();
-                sb.append(dk.getNama()).append(" (").append(dk.getSpesialisasi()).append(")");
-                cgDokter.append(sb.toString(), null);
-            }
-
-            // Ruangan tersedia
-            cgRuangan = new ChoiceGroup("Kamar Tersedia", ChoiceGroup.EXCLUSIVE);
-            listRuangan = ruanganService.cariKamarTersedia(null);
-            for (int i = 0; i < listRuangan.size(); i++) {
-                Ruangan rn = (Ruangan) listRuangan.elementAt(i);
-                StringBuffer sb = new StringBuffer();
-                sb.append(rn.getNamaRuangan()).append(" (").append(rn.getTipeKamar()).append(")");
-                cgRuangan.append(sb.toString(), null);
-            }
-
-            tfDiagnosis = new TextField("Diagnosis Awal", "", 200, TextField.ANY);
-            tfTglMasuk = new TextField("Tgl Masuk (DD/MM/YYYY)", 
-                                       DateUtil.tanggalHariIni(), 10, TextField.ANY);
-
-            append(cgDokter);
-            append(cgRuangan);
-            append(tfDiagnosis);
-            append(tfTglMasuk);
-
-            removeCommand(cmdCari);
-            addCommand(cmdProses);
-        } catch (Exception e) {
-            Alert alert = new Alert("ERROR", e.getMessage(), null, AlertType.ERROR);
-            alert.setTimeout(3000);
-            ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
+    protected void keyPressed(int keyCode) {
+        int action = getGameAction(keyCode);
+        if (action == Canvas.UP && selectedIndex > 0) {
+            selectedIndex--;
+            if (selectedIndex < scrollOffset) scrollOffset = selectedIndex;
+        } else if (action == Canvas.DOWN && daftarAdmisiDetail.size() > 0 && selectedIndex < daftarAdmisiDetail.size() - 1) {
+            selectedIndex++;
+            int startY = 50 + Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL).getHeight() + 8;
+            int maxVisible = (getHeight() - startY - 30) / (115 + 4);
+            if (selectedIndex >= scrollOffset + maxVisible) scrollOffset = selectedIndex - maxVisible + 1;
+        } else if (keyCode == Canvas.KEY_STAR) {
+            ScreenManager.getInstance().kembali();
         }
-    }
-
-    private void prosesAdmisi() {
-        try {
-            if (listDokter == null || listDokter.size() == 0) {
-                throw new Exception("Belum ada data dokter");
-            }
-            if (listRuangan == null || listRuangan.size() == 0) {
-                throw new Exception("Tidak ada kamar tersedia");
-            }
-
-            Dokter dkPilih = (Dokter) listDokter.elementAt(cgDokter.getSelectedIndex());
-            Ruangan rnPilih = (Ruangan) listRuangan.elementAt(cgRuangan.getSelectedIndex());
-
-            Admisi admisi = admisiService.buatAdmisi(
-                pasienDitemukan.getNoRM(),
-                dkPilih.getId(),
-                rnPilih.getId(),
-                tfDiagnosis.getString(),
-                tfTglMasuk.getString()
-            );
-
-            StringBuffer sb = new StringBuffer();
-            sb.append("ID Admisi : ").append(admisi.getIdAdmisi()).append("\n");
-            sb.append("Pasien    : ").append(pasienDitemukan.getNama()).append("\n");
-            sb.append("Kamar     : ").append(rnPilih.getNamaRuangan()).append("\n");
-            sb.append("Dokter    : ").append(dkPilih.getNama());
-
-            Alert alert = new Alert("ADMISI BERHASIL",
-                sb.toString(),
-                null, AlertType.CONFIRMATION);
-            alert.setTimeout(Alert.FOREVER);
-            Command cmdOK = new Command("OK", Command.OK, 1);
-            alert.addCommand(cmdOK);
-            alert.setCommandListener(new CommandListener() {
-                public void commandAction(Command cmd, Displayable disp) {
-                    ScreenManager.getInstance().kembali();
-                }
-            });
-            ScreenManager.getInstance().getDisplay().setCurrent(alert);
-        } catch (Exception e) {
-            Alert alert = new Alert("ERROR", e.getMessage(), null, AlertType.ERROR);
-            alert.setTimeout(3000);
-            ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
-        }
+        repaint();
     }
 }

@@ -3,7 +3,7 @@ MIDlet-Name: Sistem Rawat Inap
 MIDlet-Vendor: RS XYZ
 MIDlet-Version: 1.0.0
 MIDlet-Jar-URL: hospital-rawat-inap.jar
-MIDlet-Jar-Size: 92378
+MIDlet-Jar-Size: 110764
 MicroEdition-Configuration: CLDC-1.1
 MicroEdition-Profile: MIDP-2.0
 MIDlet-Description: Aplikasi Manajemen Rawat Inap Rumah Sakit
