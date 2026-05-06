@@ -50,7 +50,7 @@ public class Logger {
           .append(tag).append(": ").append(msg);
         System.out.println(sb.toString());
         if (t != null) {
-            System.out.println("  cause: " + t.toString());
+            System.out.println(new StringBuffer().append("  cause: ").append(t.toString()).toString());
             t.printStackTrace();
         }
     }

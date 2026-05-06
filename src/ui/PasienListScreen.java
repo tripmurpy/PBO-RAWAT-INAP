@@ -18,7 +18,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
     private int selectedIndex = 0;
     private int scrollOffset = 0;
     private String pesanError = "";
-    
+
     private Command cmdHapus, cmdKembali;
 
     private static final int WARNA_BG = 0x1A1A2E;
@@ -33,7 +33,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
         this.service = ServiceFactory.getInstance().getPasienService();
         setFullScreenMode(true);
         muatData();
-        
+
         cmdHapus = new Command("Hapus", Command.ITEM, 1);
         cmdKembali = new Command("Kembali", Command.BACK, 2);
         addCommand(cmdHapus);
@@ -89,7 +89,8 @@ public class PasienListScreen extends Canvas implements CommandListener {
             // Info jumlah
             g.setColor(WARNA_TEKS_REDUP);
             g.setFont(fontKecil);
-            g.drawString(new StringBuffer().append("Total: ").append(daftarPasien.size()).append(" pasien").toString(), 15, y,
+            g.drawString(new StringBuffer().append("Total: ").append(daftarPasien.size()).append(" pasien").toString(),
+                    15, y,
                     Graphics.TOP | Graphics.LEFT);
             y += fontKecil.getHeight() + 8;
 
@@ -119,13 +120,13 @@ public class PasienListScreen extends Canvas implements CommandListener {
                 int btnHapusH = 25;
                 int btnHapusX = w - 10 - btnHapusW - 5;
                 int btnHapusY = y + (itemH - btnHapusH) / 2;
-                
+
                 g.setColor(WARNA_HAPUS);
                 g.fillRoundRect(btnHapusX, btnHapusY, btnHapusW, btnHapusH, 6, 6);
                 g.setColor(WARNA_TEKS);
                 g.setFont(fontKecil);
-                g.drawString("HAPUS", btnHapusX + btnHapusW/2, btnHapusY + 5, 
-                             Graphics.TOP | Graphics.HCENTER);
+                g.drawString("HAPUS", btnHapusX + btnHapusW / 2, btnHapusY + 5,
+                        Graphics.TOP | Graphics.HCENTER);
 
                 y += itemH + 4;
             }
@@ -169,27 +170,27 @@ public class PasienListScreen extends Canvas implements CommandListener {
     protected void pointerPressed(int x, int y) {
         int w = getWidth();
         int h = getHeight();
-        
+
         // Cek klik pada list items
         int startY = 50 + Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL).getHeight() + 8;
         int itemH = 45;
         int gap = 4;
-        
+
         if (daftarPasien != null) {
             int h2 = getHeight();
             int maxVisible = (h2 - startY - 30) / (itemH + 4);
-            
+
             for (int i = scrollOffset; i < daftarPasien.size() && i < scrollOffset + maxVisible; i++) {
                 int itemY = startY + (i - scrollOffset) * (itemH + gap);
                 if (y >= itemY && y <= itemY + itemH) {
                     selectedIndex = i;
-                    
+
                     // Hit area tombol HAPUS lebih lebar (seluruh sisi kanan item)
                     int triggerX = w - 70; // Lebih lebar dari visual tombol
                     if (x >= triggerX) {
                         konfirmasiHapus((Pasien) daftarPasien.elementAt(i));
                     }
-                    
+
                     repaint();
                     return;
                 }
@@ -198,10 +199,11 @@ public class PasienListScreen extends Canvas implements CommandListener {
     }
 
     private void konfirmasiHapus(final Pasien p) {
-        Alert alert = new Alert("KONFIRMASI", new StringBuffer().append("Hapus pasien ").append(p.getNama()).append("?").toString(), 
-                                null, AlertType.CONFIRMATION);
-        Command cmdYa = new Command("Ya", Command.OK, 1);
-        Command cmdTidak = new Command("Tidak", Command.CANCEL, 2);
+        Alert alert = new Alert("KONFIRMASI",
+                new StringBuffer().append("Hapus pasien ").append(p.getNama()).append("?").toString(),
+                null, AlertType.CONFIRMATION);
+        final Command cmdYa = new Command("Ya", Command.OK, 1);
+        final Command cmdTidak = new Command("Tidak", Command.CANCEL, 2);
         alert.addCommand(cmdYa);
         alert.addCommand(cmdTidak);
         alert.setCommandListener(new CommandListener() {
@@ -213,7 +215,9 @@ public class PasienListScreen extends Canvas implements CommandListener {
                         repaint();
                         ScreenManager.getInstance().getDisplay().setCurrent(PasienListScreen.this);
                     } catch (Exception e) {
-                        Alert errorAlert = new Alert("ERROR", new StringBuffer().append("Gagal hapus: ").append(e.getMessage()).toString(), null, AlertType.ERROR);
+                        Alert errorAlert = new Alert("ERROR",
+                                new StringBuffer().append("Gagal hapus: ").append(e.getMessage()).toString(), null,
+                                AlertType.ERROR);
                         ScreenManager.getInstance().getDisplay().setCurrent(errorAlert, PasienListScreen.this);
                     }
                 } else {
@@ -224,4 +228,3 @@ public class PasienListScreen extends Canvas implements CommandListener {
         ScreenManager.getInstance().getDisplay().setCurrent(alert);
     }
 }
-

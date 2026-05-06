@@ -48,7 +48,7 @@ public abstract class BaseDB {
     /** Update entitas berdasarkan recordId. */
     protected void updateEntity(Object e, int rid) throws Exception {
         if (rid <= 0) {
-            throw new Exception("RecordId tidak valid: " + rid);
+            throw new Exception(new StringBuffer().append("RecordId tidak valid: ").append(rid).toString());
         }
         RecordStore rs = null;
         try {

@@ -22,6 +22,15 @@ public class LoginScreen extends Canvas {
     private String pesanError = "";
     private boolean sedangInput = false;
 
+    // Multi-tap state for Nokia-style keyboard
+    private static final String[] KEY_MAP = {
+        "0 ", "1", "abc2", "def3", "ghi4", "jkl5", "mno6", "pqrs7", "tuv8", "wxyz9"
+    };
+    private int lastKeyCode = -1;
+    private long lastKeyTime = 0;
+    private int tapCount = 0;
+    private static final int MULTI_TAP_TIMEOUT = 800; // ms
+
     // Layout coordinates - calculated in paint(), used in pointerPressed()
     private int cardX, cardY, cardW, cardH;
     private int fieldX, fieldW, fieldH;
@@ -147,40 +156,73 @@ public class LoginScreen extends Canvas {
 
     protected void keyPressed(int keyCode) {
         int action = getGameAction(keyCode);
+        long currentTime = System.currentTimeMillis();
 
-        if (action == UP) {
+        if (action == Canvas.UP) {
             fieldAktif = (fieldAktif - 1 + 3) % 3;
-        } else if (action == DOWN) {
+            resetMultiTap();
+        } else if (action == Canvas.DOWN) {
             fieldAktif = (fieldAktif + 1) % 3;
-        } else if (action == FIRE) {
+            resetMultiTap();
+        } else if (action == Canvas.FIRE) {
+            resetMultiTap();
             if (fieldAktif == 2) {
                 prosesLogin();
             } else {
                 fieldAktif = (fieldAktif + 1) % 3;
             }
-        } else if (keyCode == KEY_STAR || keyCode == -8) {
-            // Hapus karakter terakhir
+        } else if (keyCode == Canvas.KEY_STAR || keyCode == -8 || keyCode == 8) {
+            // Hapus karakter terakhir (Backspace)
+            resetMultiTap();
             if (fieldAktif == 0 && username.length() > 0) {
                 username.deleteCharAt(username.length() - 1);
             } else if (fieldAktif == 1 && password.length() > 0) {
                 password.deleteCharAt(password.length() - 1);
             }
-        } else if (keyCode >= KEY_NUM0 && keyCode <= KEY_NUM9) {
-            if (fieldAktif == 2 && keyCode == KEY_NUM5) {
-                prosesLogin();
-            } else if (fieldAktif < 2) {
-                // Input karakter
-                char c = mapKeyToChar(keyCode);
-                if (c != 0) {
-                    if (fieldAktif == 0) {
-                        username.append(c);
-                    } else {
-                        password.append(c);
-                    }
-                }
+        } else if (keyCode >= Canvas.KEY_NUM0 && keyCode <= Canvas.KEY_NUM9) {
+            if (fieldAktif == 2) {
+                if (keyCode == Canvas.KEY_NUM5) prosesLogin();
+            } else {
+                handleMultiTap(keyCode, currentTime);
+            }
+        } else if (keyCode > 31 && keyCode < 127) {
+            // Support for PC keyboard (direct ASCII input)
+            resetMultiTap();
+            if (fieldAktif == 0) {
+                username.append((char) keyCode);
+            } else if (fieldAktif == 1) {
+                password.append((char) keyCode);
             }
         }
         repaint();
+    }
+
+    private void resetMultiTap() {
+        lastKeyCode = -1;
+        tapCount = 0;
+    }
+
+    private void handleMultiTap(int keyCode, long currentTime) {
+        int index = keyCode - Canvas.KEY_NUM0;
+        if (index < 0 || index >= KEY_MAP.length) return;
+
+        String chars = KEY_MAP[index];
+        StringBuffer activeBuffer = (fieldAktif == 0) ? username : password;
+
+        if (keyCode == lastKeyCode && (currentTime - lastKeyTime) < MULTI_TAP_TIMEOUT) {
+            // Cycle character
+            if (activeBuffer.length() > 0) {
+                activeBuffer.deleteCharAt(activeBuffer.length() - 1);
+            }
+            tapCount = (tapCount + 1) % chars.length();
+        } else {
+            // New character
+            tapCount = 0;
+        }
+
+        activeBuffer.append(chars.charAt(tapCount));
+        lastKeyCode = keyCode;
+        lastKeyTime = currentTime;
     }
 
     protected void pointerPressed(int x, int y) {
@@ -215,30 +257,4 @@ public class LoginScreen extends Canvas {
         repaint();
     }
 
-    /** Map keyCode sederhana ke karakter */
-    private char mapKeyToChar(int keyCode) {
-        if (keyCode >= Canvas.KEY_NUM0 && keyCode <= Canvas.KEY_NUM9) {
-            return (char) ('0' + (keyCode - Canvas.KEY_NUM0));
-        }
-        // Huruf sederhana via multi-tap (simplified)
-        switch (keyCode) {
-            case Canvas.KEY_NUM2:
-                return 'a';
-            case Canvas.KEY_NUM3:
-                return 'd';
-            case Canvas.KEY_NUM4:
-                return 'g';
-            case Canvas.KEY_NUM5:
-                return 'j';
-            case Canvas.KEY_NUM6:
-                return 'm';
-            case Canvas.KEY_NUM7:
-                return 'p';
-            case Canvas.KEY_NUM8:
-                return 't';
-            case Canvas.KEY_NUM9:
-                return 'w';
-        }
-        return 0;
-    }
 }

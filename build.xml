@@ -12,9 +12,8 @@
 <project name="hospital-rawat-inap" default="build" basedir=".">
 
     <!-- Override-able via -Dwtk.home=... atau build.properties -->
-    <property file="build.properties"/>
     <property environment="env"/>
-    <property name="wtk.home" value="${env.WTK_HOME}"/>
+    <property file="build.properties"/>
 
     <property name="midp.lib"      value="${wtk.home}/lib/midpapi20.jar"/>
     <property name="cldc.lib"      value="${wtk.home}/lib/cldcapi11.jar"/>
@@ -27,12 +26,9 @@
     <property name="app.name"        value="hospital-rawat-inap"/>
 
     <target name="check-wtk">
-        <fail message="wtk.home tidak di-set. Set env WTK_HOME atau buat build.properties dengan baris: wtk.home=/path/ke/WTK">
+        <fail message="wtk.home tidak di-set. Set via -Dwtk.home=/path/ke/WTK atau buat build.properties dengan baris: wtk.home=/path/ke/WTK">
             <condition>
-                <or>
-                    <equals arg1="${wtk.home}" arg2=""/>
-                    <equals arg1="${wtk.home}" arg2="$${env.WTK_HOME}"/>
-                </or>
+                <equals arg1="${wtk.home}" arg2=""/>
             </condition>
         </fail>
     </target>
@@ -53,7 +49,8 @@
         <javac srcdir="${src.dir}"
                destdir="${bin.dir}"
                source="1.3"
-               target="1.3"
+               target="1.1"
+               fork="true"
                bootclasspath="${midp.lib}${path.separator}${cldc.lib}"
                includeantruntime="false"
                debug="false"
