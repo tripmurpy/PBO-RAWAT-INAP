@@ -58,6 +58,8 @@ public class PasienDB extends BaseDB implements IPasienRepository {
         dos.writeLong(p.getTglLahir()); dos.writeUTF(p.getJenisKelamin());
         dos.writeUTF(p.getAlamat()); dos.writeUTF(p.getNoTelp());
         dos.writeUTF(p.getAsuransi());
+        dos.writeUTF(p.getDokterPenanggungJawab() == null ? "" : p.getDokterPenanggungJawab());
+        dos.writeUTF(p.getKamarRawat() == null ? "" : p.getKamarRawat());
         byte[] result = RMSUtil.ambilBytes(s);
         dos.close();
         return result;
@@ -70,6 +72,13 @@ public class PasienDB extends BaseDB implements IPasienRepository {
         p.setTglLahir(dis.readLong()); p.setJenisKelamin(dis.readUTF());
         p.setAlamat(dis.readUTF()); p.setNoTelp(dis.readUTF());
         p.setAsuransi(dis.readUTF());
+        if (dis.available() > 0) {
+            p.setDokterPenanggungJawab(dis.readUTF());
+            p.setKamarRawat(dis.readUTF());
+        } else {
+            p.setDokterPenanggungJawab("");
+            p.setKamarRawat("");
+        }
         dis.close();
         return p;
     }

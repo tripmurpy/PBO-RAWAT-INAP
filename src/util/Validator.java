@@ -153,8 +153,8 @@ public class Validator {
         if (kosong(password)) {
             return "Password wajib diisi";
         }
-        if (password.length() < 4) {
-            return "Password minimal 4 karakter";
+        if (password.length() < 3) {
+            return "Password minimal 3 karakter";
         }
         return null;
     }

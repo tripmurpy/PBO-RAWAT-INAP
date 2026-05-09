@@ -22,29 +22,88 @@ public class SeedData {
     private static void seedDokter() {
         try {
             DokterDB db = new DokterDB();
-            if (db.findAll().size() > 0) return;
+            java.util.Vector all = db.findAll();
+            for(int i=0; i<all.size(); i++) {
+                db.delete(((Dokter)all.elementAt(i)).getRecordId());
+            }
 
-            db.save(new Dokter(IDGenerator.generateDokterId(), "Dr. Ahmad Santoso", "PD", "Senin-Jumat 08:00-12:00"));
-            db.save(new Dokter(IDGenerator.generateDokterId(), "Dr. Siti Rahayu", "A",  "Senin-Rabu 13:00-17:00"));
-            db.save(new Dokter(IDGenerator.generateDokterId(), "Dr. Budi Hartono",  "S",  "Selasa-Kamis 08:00-12:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Bayushi Eka P, Sp.JP(K)", "Jantung", "Senin-Kamis 08:00-14:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Sidhi Laksono, Sp.JP", "Jantung", "Senin-Rabu 14:00-18:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Radhiyatam M, Sp.PD", "Penyakit Dalam", "Selasa-Jumat 08:00-15:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Anggun Mekar K, Sp.PD", "Penyakit Dalam", "Senin-Kamis 09:00-16:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Johannes R, Sp.A", "Anak", "Senin-Rabu 10:00-15:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Christine Natalita, Sp.A", "Anak", "Kamis-Sabtu 08:00-13:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Agus Heriyanto, Sp.OG", "Kandungan", "Senin-Jumat 16:00-20:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Merwin Tjahjadi, Sp.OG", "Kandungan", "Selasa-Sabtu 09:00-14:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Lia Natalia, Sp.THT-KL", "THT", "Senin-Jumat 10:00-16:00"));
+            db.save(new Dokter(IDGenerator.generateDokterId(), "dr. Hilda Sasdyanita, Sp.OT", "Orthopedi", "Rabu-Sabtu 08:00-14:00"));
         } catch (Exception e) {
-            // Seed gagal — tidak kritis, lanjut
         }
     }
 
     private static void seedRuangan() {
         try {
             RuanganDB db = new RuanganDB();
-            if (db.findAll().size() > 0) return;
+            java.util.Vector all = db.findAll();
+            for(int i=0; i<all.size(); i++) {
+                db.delete(((Ruangan)all.elementAt(i)).getRecordId());
+            }
 
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "VIP-01",   Ruangan.TIPE_VIP,     1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "Kls1-01",  Ruangan.TIPE_KELAS_1, 2));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "Kls1-02",  Ruangan.TIPE_KELAS_1, 2));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "Kls2-01",  Ruangan.TIPE_KELAS_2, 4));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "Kls2-02",  Ruangan.TIPE_KELAS_2, 4));
+            // Lantai 1
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A11", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A12", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A13", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A14", Ruangan.TIPE_VVIP, 1));
+            // Lantai 2
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A21", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A22", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A23", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A24", Ruangan.TIPE_VVIP, 1));
+            // Lantai 3
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A31", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A32", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A33", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A34", Ruangan.TIPE_VVIP, 1));
+            // Lantai 4
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A41", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A42", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A43", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A44", Ruangan.TIPE_VVIP, 1));
+            // Lantai 5
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A51", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A52", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A53", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A54", Ruangan.TIPE_VVIP, 1));
+            // Lantai 6
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A61", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A62", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A63", Ruangan.TIPE_VVIP, 1));
+            // Lantai 7
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A71", Ruangan.TIPE_VIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A72", Ruangan.TIPE_VVIP, 1));
+
+            // Set some to occupied based on the report
+            Ruangan rA11 = db.findById(getRoomIdByNama(db, "A11")); if(rA11 != null) { rA11.setKosong(false); rA11.setNamaPasien("Budi Santoso"); db.update(rA11); }
+            Ruangan rA14 = db.findById(getRoomIdByNama(db, "A14")); if(rA14 != null) { rA14.setKosong(false); rA14.setNamaPasien("Siti Aminah"); db.update(rA14); }
+            Ruangan rA23 = db.findById(getRoomIdByNama(db, "A23")); if(rA23 != null) { rA23.setKosong(false); rA23.setNamaPasien("Antonius Wijaya"); db.update(rA23); }
+            Ruangan rA33 = db.findById(getRoomIdByNama(db, "A33")); if(rA33 != null) { rA33.setKosong(false); rA33.setNamaPasien("Rina Melati"); db.update(rA33); }
+            Ruangan rA42 = db.findById(getRoomIdByNama(db, "A42")); if(rA42 != null) { rA42.setKosong(false); rA42.setNamaPasien("Hendra Gunawan"); db.update(rA42); }
+            Ruangan rA53 = db.findById(getRoomIdByNama(db, "A53")); if(rA53 != null) { rA53.setKosong(false); rA53.setNamaPasien("Wahyu Saputra"); db.update(rA53); }
+            Ruangan rA63 = db.findById(getRoomIdByNama(db, "A63")); if(rA63 != null) { rA63.setKosong(false); rA63.setNamaPasien("Eka Pertiwi"); db.update(rA63); }
+
         } catch (Exception e) {
-            // Seed gagal — tidak kritis
         }
+    }
+
+    private static String getRoomIdByNama(RuanganDB db, String nama) {
+        try {
+            java.util.Vector all = db.findAll();
+            for(int i=0; i<all.size(); i++) {
+                Ruangan r = (Ruangan) all.elementAt(i);
+                if(r.getNamaRuangan().equals(nama)) return r.getId();
+            }
+        } catch(Exception e) {}
+        return "";
     }
 
     private static void seedObat() {

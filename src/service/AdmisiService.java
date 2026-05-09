@@ -70,7 +70,7 @@ public class AdmisiService {
         admisiRepo.save(admisi);
 
         // Update status kamar menjadi TERISI
-        ruanganService.isiKamar(idRuangan, pasien.getNama());
+        ruanganService.isiKamar(idRuangan, pasien.getNama(), "");
 
         return admisi;
     }

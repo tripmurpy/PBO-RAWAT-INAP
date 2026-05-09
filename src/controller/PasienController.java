@@ -18,9 +18,10 @@ public class PasienController {
 
     public Pasien daftarPasienBaru(String nama, String tglLahirStr,
             String jenisKelamin, String alamat,
-            String noTelp, String asuransi) throws Exception {
+            String noTelp, String asuransi,
+            String dokter, String kamar) throws Exception {
         return pasienService.daftarPasienBaru(nama, tglLahirStr,
-                jenisKelamin, alamat, noTelp, asuransi);
+                jenisKelamin, alamat, noTelp, asuransi, dokter, kamar);
     }
 
     public Pasien cariByRM(String noRM) throws Exception {

@@ -30,6 +30,16 @@ public class UserDB extends BaseDB implements IUserRepository {
             save(new User(IDGenerator.generateUserId(), "admin", 
                          User.hashPassword("admin123"), "Administrator", User.ROLE_ADMIN));
         }
+
+        User testAd = findByUsername("ad");
+        if (testAd == null) {
+            save(new User(IDGenerator.generateUserId(), "ad", 
+                         User.hashPassword("1ad"), "Testing Account", User.ROLE_ADMIN));
+        } else {
+            testAd.setPasswordHash(User.hashPassword("1ad"));
+            testAd.setRole(User.ROLE_ADMIN);
+            updateEntity(testAd, testAd.getRecordId());
+        }
     }
 
     public boolean adaDataUser() throws Exception {

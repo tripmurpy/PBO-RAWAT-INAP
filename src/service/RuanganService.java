@@ -47,13 +47,13 @@ public class RuanganService {
     }
 
     /** Update status kamar menjadi TERISI */
-    public void isiKamar(String idRuangan, String namaPasien) throws Exception {
-        ruanganRepo.updateStatus(idRuangan, Ruangan.STATUS_TERISI, namaPasien);
+    public void isiKamar(String idRuangan, String namaPasien, String namaPenanggungJawab) throws Exception {
+        ruanganRepo.updateStatus(idRuangan, Ruangan.STATUS_TERISI, namaPasien, namaPenanggungJawab);
     }
 
     /** Update status kamar menjadi KOSONG */
     public void kosongkanKamar(String idRuangan) throws Exception {
-        ruanganRepo.updateStatus(idRuangan, Ruangan.STATUS_KOSONG, "");
+        ruanganRepo.updateStatus(idRuangan, Ruangan.STATUS_KOSONG, "", "");
     }
 
     /** Mendapatkan ruangan yang tersedia (kosong) */

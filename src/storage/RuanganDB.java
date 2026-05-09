@@ -40,11 +40,12 @@ public class RuanganDB extends BaseDB implements IRuanganRepository {
         return result;
     }
 
-    public void updateStatus(String id, String status, String namaPasien) throws Exception {
+    public void updateStatus(String id, String status, String namaPasien, String namaPenanggungJawab) throws Exception {
         Ruangan r = findById(id);
         if (r != null) {
             r.setKosong(status.equalsIgnoreCase("KOSONG"));
             r.setNamaPasien(namaPasien);
+            r.setNamaPenanggungJawab(namaPenanggungJawab);
             update(r);
         }
     }
@@ -66,6 +67,9 @@ public class RuanganDB extends BaseDB implements IRuanganRepository {
         dos.writeBoolean(r.isKosong());
         dos.writeUTF(r.getNoRM() == null ? "" : r.getNoRM());
         dos.writeUTF(r.getNamaPasien() == null ? "" : r.getNamaPasien());
+        dos.writeDouble(r.getHarga());
+        dos.writeUTF(r.getFasilitas() == null ? "" : r.getFasilitas());
+        dos.writeUTF(r.getNamaPenanggungJawab() == null ? "" : r.getNamaPenanggungJawab());
         byte[] result = RMSUtil.ambilBytes(s);
         dos.close();
         return result;
@@ -81,6 +85,15 @@ public class RuanganDB extends BaseDB implements IRuanganRepository {
         r.setKosong(dis.readBoolean());
         r.setNoRM(dis.readUTF());
         r.setNamaPasien(dis.readUTF());
+        if (dis.available() > 0) {
+            r.setHarga(dis.readDouble());
+            r.setFasilitas(dis.readUTF());
+            r.setNamaPenanggungJawab(dis.readUTF());
+        } else {
+            r.setHarga(0);
+            r.setFasilitas("");
+            r.setNamaPenanggungJawab("");
+        }
         dis.close();
         return r;
     }

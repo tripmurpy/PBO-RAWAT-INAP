@@ -18,6 +18,7 @@ public class Ruangan {
     public static final String TIPE_KELAS_1 = "Kelas I";
     public static final String TIPE_KELAS_2 = "Kelas II";
     public static final String TIPE_KELAS_3 = "Kelas III";
+    public static final String TIPE_VVIP = "VVIP";
 
     // ========== FIELD PRIVATE (ENCAPSULATION) ==========
     private int recordId;
@@ -28,6 +29,9 @@ public class Ruangan {
     private String statusKamar; // KOSONG / TERISI / MAINTENANCE
     private String namaPasien; // Nama pasien jika TERISI (opsional)
     private String noRM; // No. RM pasien jika TERISI
+    private double harga; // Harga per malam
+    private String fasilitas; // Daftar fasilitas
+    private String namaPenanggungJawab; // Nama penanggung jawab jika TERISI
 
     // ========== KONSTRUKTOR ==========
 
@@ -35,16 +39,25 @@ public class Ruangan {
         this.statusKamar = STATUS_KOSONG;
         this.namaPasien = "";
         this.noRM = "";
+        this.namaPenanggungJawab = "";
+        this.fasilitas = "";
     }
 
     public Ruangan(String id, String namaRuangan, String tipeKamar, int kapasitas) {
+        this(id, namaRuangan, tipeKamar, kapasitas, 0, "");
+    }
+
+    public Ruangan(String id, String namaRuangan, String tipeKamar, int kapasitas, double harga, String fasilitas) {
         this.id = id;
         this.namaRuangan = namaRuangan;
         this.tipeKamar = tipeKamar;
         this.kapasitas = kapasitas;
+        this.harga = harga;
+        this.fasilitas = fasilitas;
         this.statusKamar = STATUS_KOSONG;
         this.namaPasien = "";
         this.noRM = "";
+        this.namaPenanggungJawab = "";
     }
 
     // ========== GETTER (ENCAPSULATION) ==========
@@ -75,6 +88,18 @@ public class Ruangan {
 
     public String getNamaPasien() {
         return namaPasien;
+    }
+
+    public double getHarga() {
+        return harga;
+    }
+
+    public String getFasilitas() {
+        return fasilitas;
+    }
+
+    public String getNamaPenanggungJawab() {
+        return namaPenanggungJawab;
     }
 
     /**
@@ -129,11 +154,25 @@ public class Ruangan {
         this.noRM = noRM;
     }
 
+    public void setHarga(double harga) {
+        this.harga = harga;
+    }
+
+    public void setFasilitas(String fasilitas) {
+        this.fasilitas = fasilitas;
+    }
+
+    public void setNamaPenanggungJawab(String namaPenanggungJawab) {
+        this.namaPenanggungJawab = namaPenanggungJawab;
+    }
+
     public void setKosong(boolean kosong) {
         if (kosong) {
             this.statusKamar = STATUS_KOSONG;
             this.noRM = "";
             this.namaPasien = "";
+        } else {
+            this.statusKamar = STATUS_TERISI;
         }
     }
 

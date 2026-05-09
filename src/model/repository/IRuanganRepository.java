@@ -13,7 +13,7 @@ public interface IRuanganRepository {
     Ruangan findById(String id) throws Exception;
     Vector findAll() throws Exception;
     Vector findAvailable(String tipeKamar) throws Exception;
-    void updateStatus(String id, String status, String namaPasien) throws Exception;
+    void updateStatus(String id, String status, String namaPasien, String namaPenanggungJawab) throws Exception;
     void update(Ruangan ruangan) throws Exception;
     void delete(int recordId) throws Exception;
 }

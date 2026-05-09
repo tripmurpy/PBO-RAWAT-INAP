@@ -253,7 +253,7 @@ public class LoginScreen extends Canvas {
             // Navigasi ke Dashboard
             ScreenManager.getInstance().tampilkanLayar(new DashboardScreen(user));
         } catch (Exception e) {
-            pesanError = e.getMessage();
+            pesanError = e.getMessage() != null ? e.getMessage() : "Terjadi Kesalahan Sistem";
         }
         repaint();
     }

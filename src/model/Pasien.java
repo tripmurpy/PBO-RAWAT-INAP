@@ -18,6 +18,8 @@ public class Pasien extends Person {
     private String noTelp;
     private String asuransi;
     private String status;
+    private String dokterPenanggungJawab;
+    private String kamarRawat;
 
     public Pasien() {
         this.status = STATUS_AKTIF;
@@ -31,6 +33,8 @@ public class Pasien extends Person {
         this.noTelp = noTelp;
         this.asuransi = asuransi;
         this.status = STATUS_AKTIF;
+        this.dokterPenanggungJawab = "";
+        this.kamarRawat = "";
     }
 
     // noRM is the id field from Entity
@@ -80,6 +84,22 @@ public class Pasien extends Person {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getDokterPenanggungJawab() {
+        return dokterPenanggungJawab;
+    }
+
+    public void setDokterPenanggungJawab(String dokterPenanggungJawab) {
+        this.dokterPenanggungJawab = dokterPenanggungJawab;
+    }
+
+    public String getKamarRawat() {
+        return kamarRawat;
+    }
+
+    public void setKamarRawat(String kamarRawat) {
+        this.kamarRawat = kamarRawat;
     }
 
     public boolean isAktif() {
