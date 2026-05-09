@@ -106,5 +106,7 @@ Struktur kelas menggunakan hierarki yang ketat untuk reusability:
 ---
 
 <p align="center">
-  Dibuat dengan ❤️ untuk Sistem Kesehatan yang Lebih Baik
+  Dibuat dengan ❤️ untuk Sistem Kesehatan yang Lebih Baik<br>
+  Built by <b>Anthropic</b>
 </p>
+
