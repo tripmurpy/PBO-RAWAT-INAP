@@ -26,7 +26,7 @@ public class HospitalMIDlet extends MIDlet {
             // Init ScreenManager dan tampilkan login
             ScreenManager sm = ScreenManager.getInstance();
             sm.init(this);
-            sm.tampilkanLayar(new LoginScreen());
+            sm.tampilkanLayar(new WelcomeScreen());
 
             sudahDiinisialisasi = true;
         }

@@ -127,23 +127,31 @@ public class PasienListScreen extends Canvas implements CommandListener {
                 g.setFont(fontKecil);
                 g.drawString(new StringBuffer().append("Telp: ").append(p.getNoTelp()).toString(),
                         70, y + 4 + fontSedang.getHeight(), Graphics.TOP | Graphics.LEFT);
-                        
-                // Info Dokter/Ruangan (Mockup)
+
+                // Info Dokter/Ruangan (real data from Pasien)
+                StringBuffer infoBuf = new StringBuffer();
+                String dok = p.getDokterPenanggungJawab();
+                String kam = p.getKamarRawat();
+                if (dok != null && dok.length() > 0) {
+                    infoBuf.append("Dr. ").append(dok);
+                } else {
+                    infoBuf.append("Dokter: -");
+                }
+                infoBuf.append(" | ");
+                if (kam != null && kam.length() > 0) {
+                    infoBuf.append(kam);
+                } else {
+                    infoBuf.append("Kamar: -");
+                }
                 g.setColor(WARNA_AKSEN);
-                g.drawString("Dokter: Belum | R. Poli",
+                g.drawString(infoBuf.toString(),
                         70, y + 6 + fontSedang.getHeight() + fontKecil.getHeight(), Graphics.TOP | Graphics.LEFT);
 
-                // Tombol Set Dokter di kanan
-                int btnW = 55;
-                int btnH = 25;
-                int btnX = w - 10 - btnW - 5;
-                int btnYPos = y + (itemH - btnH) / 2;
-
-                g.setColor(WARNA_AKSEN);
-                g.fillRoundRect(btnX, btnYPos, btnW, btnH, 6, 6);
-                g.setColor(WARNA_TEKS_TERANG);
-                g.setFont(fontKecil);
-                g.drawString("DOKTER", btnX + btnW / 2, btnYPos + 5, Graphics.TOP | Graphics.HCENTER);
+                // Arrow indicator ">"
+                g.setColor(WARNA_TEKS_REDUP);
+                g.setFont(fontSedang);
+                g.drawString(">", w - 22, y + (itemH - fontSedang.getHeight()) / 2,
+                        Graphics.TOP | Graphics.LEFT);
 
                 y += itemH + 4;
             }
@@ -154,7 +162,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
         g.fillRect(0, h - 25, w, 25);
         g.setColor(WARNA_TEKS_REDUP);
         g.setFont(fontKecil);
-        g.drawString("Pilih item & tekan OK untuk Assign Dokter", 10, h - 20, Graphics.TOP | Graphics.LEFT);
+        g.drawString("Tap pasien untuk lihat detail", 10, h - 20, Graphics.TOP | Graphics.LEFT);
     }
 
     protected void keyPressed(int keyCode) {
@@ -168,7 +176,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
             selectedIndex++;
             // Scroll down if needed
             int h = getHeight();
-            int itemH = 45;
+            int itemH = 60;
             int startY = 50 + Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL).getHeight() + 8;
             int maxVisible = (h - startY - 30) / (itemH + 4);
             if (selectedIndex >= scrollOffset + maxVisible) {
@@ -178,7 +186,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
             ScreenManager.getInstance().kembali();
         } else if (action == Canvas.FIRE || keyCode == Canvas.KEY_NUM5) {
             if (daftarPasien != null && selectedIndex >= 0 && selectedIndex < daftarPasien.size()) {
-                bukaFormDokter((Pasien) daftarPasien.elementAt(selectedIndex));
+                bukaDetailPasien((Pasien) daftarPasien.elementAt(selectedIndex));
             }
         }
         repaint();
@@ -190,7 +198,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
 
         // Cek klik pada list items
         int startY = 50 + Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL).getHeight() + 8;
-        int itemH = 45;
+        int itemH = 60;
         int gap = 4;
 
         if (daftarPasien != null) {
@@ -201,13 +209,7 @@ public class PasienListScreen extends Canvas implements CommandListener {
                 int itemY = startY + (i - scrollOffset) * (itemH + gap);
                 if (y >= itemY && y <= itemY + itemH) {
                     selectedIndex = i;
-
-                    // Hit area tombol DOKTER lebih lebar (seluruh sisi kanan item)
-                    int triggerX = w - 70; // Lebih lebar dari visual tombol
-                    if (x >= triggerX) {
-                        bukaFormDokter((Pasien) daftarPasien.elementAt(i));
-                    }
-
+                    bukaDetailPasien((Pasien) daftarPasien.elementAt(i));
                     repaint();
                     return;
                 }
@@ -215,36 +217,11 @@ public class PasienListScreen extends Canvas implements CommandListener {
         }
     }
 
-    private void bukaFormDokter(final Pasien p) {
-        final Form form = new Form("Assign Dokter - " + p.getNama());
-        final ChoiceGroup cgDokter = new ChoiceGroup("Pilih Dokter", ChoiceGroup.EXCLUSIVE);
-        
-        try {
-            java.util.Vector listDokter = ServiceFactory.getInstance().getDokterService().getSemuaDokter();
-            for (int i = 0; i < listDokter.size(); i++) {
-                model.Dokter dk = (model.Dokter) listDokter.elementAt(i);
-                cgDokter.append(dk.getNama() + " (" + dk.getSpesialisasi() + ")", null);
-            }
-        } catch (Exception e) {}
-        
-        form.append(cgDokter);
-        
-        final Command cmdSimpan = new Command("Simpan", Command.OK, 1);
-        final Command cmdBatalDokter = new Command("Batal", Command.BACK, 2);
-        form.addCommand(cmdSimpan);
-        form.addCommand(cmdBatalDokter);
-        form.setCommandListener(new CommandListener() {
-            public void commandAction(Command c, Displayable d) {
-                if (c == cmdSimpan) {
-                    // Implementasi simpan (mockup visual)
-                    ScreenManager.getInstance().getDisplay().setCurrent(PasienListScreen.this);
-                } else if (c == cmdBatalDokter) {
-                    ScreenManager.getInstance().getDisplay().setCurrent(PasienListScreen.this);
-                }
-            }
-        });
-        
-        ScreenManager.getInstance().getDisplay().setCurrent(form);
+    /**
+     * Membuka layar detail pasien.
+     */
+    private void bukaDetailPasien(Pasien p) {
+        ScreenManager.getInstance().tampilkanLayar(new PasienDetailScreen(p));
     }
 
     private void konfirmasiHapus(final Pasien p) {
