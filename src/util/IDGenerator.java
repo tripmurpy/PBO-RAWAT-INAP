@@ -57,40 +57,8 @@ public class IDGenerator {
                 .append(padTigaDigit(counter)).toString();
     }
 
-    /**
-     * Generate ID Obat: OBT-XXXX
-     */
-    public static String generateObatId() {
-        int counter = ambilDanNaikkanCounter("obat");
-        return new StringBuffer().append("OBT-").append(padEmpatDigit(counter)).toString();
-    }
-
-    /**
-     * Generate ID RekamMedis: RMD-YYYYMMDD-XXX
-     */
-    public static String generateRekamMedisId() {
-        int counter = ambilDanNaikkanCounter("rekammedis");
-        String tanggal = DateUtil.formatTanggalKompak(DateUtil.sekarang());
-        return new StringBuffer().append("RMD-").append(tanggal).append("-")
-                .append(padTigaDigit(counter)).toString();
-    }
-
-    /**
-     * Generate ID Resep: RSP-XXXX
-     */
-    public static String generateResepId() {
-        int counter = ambilDanNaikkanCounter("resep");
-        return new StringBuffer().append("RSP-").append(padEmpatDigit(counter)).toString();
-    }
-
-    /**
-     * Generate ID CatatanHarian: CTT-XXXX
-     */
-    public static String generateCatatanId() {
-        int counter = ambilDanNaikkanCounter("catatan");
-        return new StringBuffer().append("CTT-").append(padEmpatDigit(counter)).toString();
-    }
     // ========== INTERNAL ==========
+
 
     private static String prefixCounter(String prefix, String kategori, int digits) {
         int counter = ambilDanNaikkanCounter(kategori);

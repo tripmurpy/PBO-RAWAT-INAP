@@ -3,11 +3,9 @@ package util;
 import model.Dokter;
 import model.Pasien;
 import model.Ruangan;
-import model.Obat;
 import storage.DokterDB;
 import storage.PasienDB;
 import storage.RuanganDB;
-import storage.ObatDB;
 
 /**
  * SeedData — Mengisi data awal pada first run aplikasi.
@@ -18,7 +16,6 @@ public class SeedData {
     public static void run() {
         seedDokter();
         seedRuangan();
-        seedObat();
         seedPasien();
     }
 
@@ -109,27 +106,8 @@ public class SeedData {
         return "";
     }
 
-    private static void seedObat() {
-        try {
-            ObatDB db = new ObatDB();
-            if (db.getAll().size() > 0) return;
-
-            db.save(new Obat(IDGenerator.generateObatId(), "Paracetamol 500mg",  Obat.BENTUK_TABLET,   "tablet",  500, 50, 500));
-            db.save(new Obat(IDGenerator.generateObatId(), "Amoxicillin 500mg",  Obat.BENTUK_TABLET,   "kapsul",  200, 20, 2000));
-            db.save(new Obat(IDGenerator.generateObatId(), "Omeprazole 20mg",    Obat.BENTUK_TABLET,   "kapsul",  150, 20, 3000));
-            db.save(new Obat(IDGenerator.generateObatId(), "Ondansetron 4mg",    Obat.BENTUK_INJEKSI,  "ampul",    50, 10, 15000));
-            db.save(new Obat(IDGenerator.generateObatId(), "Ringer Laktat",      Obat.BENTUK_INJEKSI,  "kolf",    100, 20, 25000));
-            db.save(new Obat(IDGenerator.generateObatId(), "Ambroxol Sirup",     Obat.BENTUK_SIRUP,    "botol",    60, 10, 12000));
-            db.save(new Obat(IDGenerator.generateObatId(), "Ibuprofen 400mg",    Obat.BENTUK_TABLET,   "tablet",  300, 30, 1500));
-            db.save(new Obat(IDGenerator.generateObatId(), "Cefixime 100mg",     Obat.BENTUK_TABLET,   "kapsul",  100, 15, 5000));
-            db.save(new Obat(IDGenerator.generateObatId(), "Metronidazol 500mg", Obat.BENTUK_TABLET,   "tablet",  200, 20, 1000));
-            db.save(new Obat(IDGenerator.generateObatId(), "Vit C 500mg",        Obat.BENTUK_TABLET,   "tablet", 1000, 100, 300));
-        } catch (Exception e) {
-            // Seed gagal — tidak kritis
-        }
-    }
-
     // ========== SEED PASIEN ==========
+
 
     private static void seedPasien() {
         try {
