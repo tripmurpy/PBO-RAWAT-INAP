@@ -103,8 +103,35 @@ Struktur kelas menggunakan hierarki yang ketat untuk reusability:
 | 📄 `MANIFEST.MF` | Konfigurasi atribut JAR untuk MIDlet. |
 | 📄 `*.jad` | Descriptor file untuk instalasi aplikasi di perangkat/emulator. |
 
+
 ---
 
+## 🛠 Fixing Problem
+
+Bagian ini merangkum serangkaian perbaikan, optimasi, dan penambahan fitur yang dilakukan untuk meningkatkan kualitas sistem:
+
+### 1. Modernisasi UI & UX
+*   **Login Screen**: Redesain total menjadi tampilan minimalis premium dengan palet warna modern dan perbaikan visual pada field password.
+*   **Pasien Detail Screen**: Implementasi kartu detail pasien yang mengintegrasikan data identitas, dokter penanggung jawab, dan rincian kamar rawat dalam satu tampilan elegan.
+*   **Daftar Pasien**: Navigasi daftar pasien diperbarui agar langsung menuju layar detail, memberikan akses informasi yang lebih cepat bagi petugas.
+
+### 2. Optimalisasi Form Pendaftaran
+*   **Input Kontrol**: Mengubah input tanggal lahir menjadi `TextField` dan dropdown jenis kelamin/asuransi menjadi `POPUP` untuk mengatasi masalah unclickable pada emulator.
+*   **Integrasi Medis**: Penambahan fitur pemilihan Dokter Penanggung Jawab (DPJP) dan Kamar Rawat langsung di dalam form pendaftaran.
+
+### 3. Sistem Pemilihan Kamar Interaktif
+*   **Visual Status**: Implementasi `KamarSelectionScreen` berbasis Canvas yang menampilkan status kamar secara visual (Warna Hijau/Merah/Oranye) sesuai dengan kondisi riil di database.
+*   **Interactive Picking**: Tombol pemilihan kamar kini terintegrasi penuh antara form pendaftaran dan database ruangan.
+
+### 4. Manajemen Data & Persistensi
+*   **Seed Data Otomatis**: Inisialisasi otomatis untuk 10 Dokter Spesialis (RS Eka Hospital), 25 Kamar (Gedung A, Lantai 1-7), dan 6 Pasien awal untuk keperluan pengujian sistem.
+*   **Sinkronisasi RMS**: Perbaikan logika penyimpanan pada RMS untuk memastikan status kamar dan data pasien selalu sinkron (Kamar otomatis TERISI saat pasien terdaftar).
+
+### 5. Pembersihan & Arsitektur
+*   **Analisis Dead Code**: Identifikasi modul-modul lama yang tidak terpakai (Laporan lama, Obat, Admisi UI lama) untuk langkah optimalisasi ukuran JAR di masa mendatang.
+*   **Backward Compatibility**: Implementasi pengecekan `available()` pada stream data untuk memastikan sistem tetap bisa membaca data lama meskipun ada penambahan field baru pada model.
+
+---
 <p align="center">
   Dibuat dengan ❤️ untuk Sistem Kesehatan yang Lebih Baik<br>
   Built by <b>Anthropic</b>
