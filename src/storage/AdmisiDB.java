@@ -69,6 +69,12 @@ public class AdmisiDB extends BaseDB implements IAdmisiRepository {
         dos.writeUTF(a.getStatus());
         dos.writeLong(a.getTglKeluar());
         dos.writeInt(a.getBiayaTotal());
+        dos.writeUTF(a.getTipePembayaran() == null ? "" : a.getTipePembayaran());
+        dos.writeUTF(a.getNamaBank() == null ? "" : a.getNamaBank());
+        dos.writeInt(a.getBiayaRuangan());
+        dos.writeInt(a.getBiayaMakanan());
+        dos.writeInt(a.getBiayaObat());
+        dos.writeInt(a.getBiayaAdmin());
         byte[] result = RMSUtil.ambilBytes(s);
         dos.close();
         return result;
@@ -86,6 +92,19 @@ public class AdmisiDB extends BaseDB implements IAdmisiRepository {
         a.setStatus(dis.readUTF());
         a.setTglKeluar(dis.readLong());
         a.setBiayaTotal(dis.readInt());
+        if (dis.available() > 0) {
+            a.setTipePembayaran(dis.readUTF());
+            a.setNamaBank(dis.readUTF());
+            if (dis.available() > 0) {
+                a.setBiayaRuangan(dis.readInt());
+                a.setBiayaMakanan(dis.readInt());
+                a.setBiayaObat(dis.readInt());
+                a.setBiayaAdmin(dis.readInt());
+            }
+        } else {
+            a.setTipePembayaran("");
+            a.setNamaBank("");
+        }
         dis.close();
         return a;
     }

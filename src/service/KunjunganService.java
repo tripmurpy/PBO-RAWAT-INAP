@@ -40,7 +40,14 @@ public class KunjunganService {
                 a.getTglKeluar(),
                 a.getStatus(),
                 a.isAktif() ? a.getDiagnosisAwal() : a.getDiagnosisAkhir(),
-                lamaRawat
+                lamaRawat,
+                a.getBiayaTotal(),
+                a.getBiayaRuangan(),
+                a.getBiayaMakanan(),
+                a.getBiayaObat(),
+                a.getBiayaAdmin(),
+                a.getTipePembayaran(),
+                a.getNamaBank()
             );
             listKunjungan.addElement(k);
         }

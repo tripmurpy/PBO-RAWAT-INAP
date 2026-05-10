@@ -50,37 +50,37 @@ public class SeedData {
             }
 
             // Lantai 1
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A11", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A12", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A13", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A14", Ruangan.TIPE_VVIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A11", Ruangan.TIPE_VIP, 1, 1500000, "AC, TV, Sofa, Fridge"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A12", Ruangan.TIPE_VIP, 1, 1500000, "AC, TV, Sofa, Fridge"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A13", Ruangan.TIPE_VIP, 1, 1500000, "AC, TV, Sofa, Fridge"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A14", Ruangan.TIPE_VVIP, 1, 2500000, "Living Room, Kitchenette, 2 TVs"));
             // Lantai 2
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A21", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A22", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A23", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A24", Ruangan.TIPE_VVIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A21", Ruangan.TIPE_VIP, 1, 1500000, "AC, TV, Sofa"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A22", Ruangan.TIPE_VIP, 1, 1500000, "AC, TV, Sofa"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A23", Ruangan.TIPE_VIP, 1, 1500000, "AC, TV, Sofa"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A24", Ruangan.TIPE_VVIP, 1, 2500000, "Deluxe Facilities"));
             // Lantai 3
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A31", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A32", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A33", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A34", Ruangan.TIPE_VVIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A31", Ruangan.TIPE_VIP, 1, 1500000, "Standard VIP"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A32", Ruangan.TIPE_VIP, 1, 1500000, "Standard VIP"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A33", Ruangan.TIPE_VIP, 1, 1500000, "Standard VIP"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A34", Ruangan.TIPE_VVIP, 1, 2500000, "Premium VVIP"));
             // Lantai 4
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A41", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A42", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A43", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A44", Ruangan.TIPE_VVIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A41", Ruangan.TIPE_VIP, 1, 1500000, "VIP Room"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A42", Ruangan.TIPE_VIP, 1, 1500000, "VIP Room"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A43", Ruangan.TIPE_VIP, 1, 1500000, "VIP Room"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A44", Ruangan.TIPE_VVIP, 1, 2500000, "Elite VVIP Suite"));
             // Lantai 5
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A51", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A52", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A53", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A54", Ruangan.TIPE_VVIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A51", Ruangan.TIPE_VIP, 1, 1500000, "Standard VIP"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A52", Ruangan.TIPE_VIP, 1, 1500000, "Standard VIP"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A53", Ruangan.TIPE_VIP, 1, 1500000, "Standard VIP"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A54", Ruangan.TIPE_VVIP, 1, 2500000, "Superior VVIP"));
             // Lantai 6
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A61", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A62", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A63", Ruangan.TIPE_VVIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A61", Ruangan.TIPE_VIP, 1, 1500000, "VIP"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A62", Ruangan.TIPE_VIP, 1, 1500000, "VIP"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A63", Ruangan.TIPE_VVIP, 1, 2500000, "VVIP"));
             // Lantai 7
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A71", Ruangan.TIPE_VIP, 1));
-            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A72", Ruangan.TIPE_VVIP, 1));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A71", Ruangan.TIPE_VIP, 1, 1500000, "VIP"));
+            db.save(new Ruangan(IDGenerator.generateRuanganId(), "A72", Ruangan.TIPE_VVIP, 1, 2500000, "VVIP"));
 
             // Set some to occupied based on the report
             Ruangan rA11 = db.findById(getRoomIdByNama(db, "A11")); if(rA11 != null) { rA11.setKosong(false); rA11.setNamaPasien("Budi Santoso"); db.update(rA11); }

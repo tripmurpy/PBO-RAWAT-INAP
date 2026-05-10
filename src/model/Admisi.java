@@ -28,6 +28,12 @@ public class Admisi {
     private String catatan; // Catatan tambahan
     private String status; // AKTIF / SELESAI
     private int biayaTotal; // Total biaya rawat inap
+    private int biayaRuangan;   // Biaya sewa kamar
+    private int biayaMakanan;   // Biaya makan/gizi
+    private int biayaObat;      // Biaya obat & vitamin
+    private int biayaAdmin;     // Biaya administrasi
+    private String tipePembayaran; // CASH, QRIS, DEBIT, KREDIT
+    private String namaBank;       // BCA, BRI, BNI, MANDIRI, PERMATA, MEGA (kosong jika CASH/QRIS)
 
     // ========== KONSTRUKTOR ==========
 
@@ -37,6 +43,13 @@ public class Admisi {
         this.diagnosisAkhir = "";
         this.kodeICD10 = "";
         this.catatan = "";
+        this.tipePembayaran = "";
+        this.namaBank = "";
+        this.biayaTotal = 0;
+        this.biayaRuangan = 0;
+        this.biayaMakanan = 0;
+        this.biayaObat = 0;
+        this.biayaAdmin = 0;
     }
 
     public Admisi(String idAdmisi, String noRMPasien, String idDokter,
@@ -52,6 +65,13 @@ public class Admisi {
         this.diagnosisAkhir = "";
         this.kodeICD10 = "";
         this.catatan = "";
+        this.tipePembayaran = "";
+        this.namaBank = "";
+        this.biayaTotal = 0;
+        this.biayaRuangan = 0;
+        this.biayaMakanan = 0;
+        this.biayaObat = 0;
+        this.biayaAdmin = 0;
     }
 
     // ========== GETTER (ENCAPSULATION) ==========
@@ -174,6 +194,34 @@ public class Admisi {
 
     public void setBiayaTotal(int biayaTotal) {
         this.biayaTotal = biayaTotal;
+    }
+
+    public int getBiayaRuangan() { return biayaRuangan; }
+    public void setBiayaRuangan(int biayaRuangan) { this.biayaRuangan = biayaRuangan; }
+
+    public int getBiayaMakanan() { return biayaMakanan; }
+    public void setBiayaMakanan(int biayaMakanan) { this.biayaMakanan = biayaMakanan; }
+
+    public int getBiayaObat() { return biayaObat; }
+    public void setBiayaObat(int biayaObat) { this.biayaObat = biayaObat; }
+
+    public int getBiayaAdmin() { return biayaAdmin; }
+    public void setBiayaAdmin(int biayaAdmin) { this.biayaAdmin = biayaAdmin; }
+
+    public String getTipePembayaran() {
+        return tipePembayaran;
+    }
+
+    public void setTipePembayaran(String tipePembayaran) {
+        this.tipePembayaran = tipePembayaran;
+    }
+
+    public String getNamaBank() {
+        return namaBank;
+    }
+
+    public void setNamaBank(String namaBank) {
+        this.namaBank = namaBank;
     }
 
     // Alias untuk noRMPasien agar kompatibel dengan DB layer

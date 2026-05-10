@@ -1,4 +1,4 @@
-MIDlet-1: Sistem Rawat Inap,,ui.HospitalMIDlet
+MIDlet-1: Sistem Rawat Inap,,util.ui.HospitalMIDlet
 MIDlet-Name: Sistem Rawat Inap
 MIDlet-Vendor: RS XYZ
 MIDlet-Version: 1.0.0

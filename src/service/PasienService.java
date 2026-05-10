@@ -81,4 +81,10 @@ public class PasienService {
     public void hapusPasien(int recordId) throws Exception {
         pasienRepo.delete(recordId);
     }
+
+    /** Mengeluarkan pasien (status → PULANG) */
+    public void keluarkanPasien(Pasien pasien) throws Exception {
+        pasien.setStatus(Pasien.STATUS_PULANG);
+        pasienRepo.update(pasien);
+    }
 }

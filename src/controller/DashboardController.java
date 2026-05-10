@@ -1,12 +1,12 @@
 package controller;
 
-import ui.ScreenManager;
-import ui.PasienFormScreen;
-import ui.PasienListScreen;
-import ui.DokterScreen;
-import ui.RuanganScreen;
-import ui.KunjunganScreen;
-import ui.LoginScreen;
+import util.ui.DokterScreen;
+import util.ui.KunjunganScreen;
+import util.ui.LoginScreen;
+import util.ui.PasienFormScreen;
+import util.ui.PasienListScreen;
+import util.ui.RuanganScreen;
+import util.ui.ScreenManager;
 
 /**
  * DashboardController — Routing navigasi dari menu utama.

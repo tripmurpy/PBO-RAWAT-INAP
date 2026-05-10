@@ -83,4 +83,19 @@ public class RuanganService {
         }
         return new int[]{total, terisi, total - terisi};
     }
+
+    /** Melepaskan kamar berdasarkan nama ruangan (set KOSONG) */
+    public void lepaskanKamar(String namaKamar) throws Exception {
+        if (namaKamar == null || namaKamar.length() == 0) return;
+        Vector semua = ruanganRepo.findAll();
+        for (int i = 0; i < semua.size(); i++) {
+            Ruangan r = (Ruangan) semua.elementAt(i);
+            if (namaKamar.equals(r.getNamaRuangan())) {
+                r.setKosong(true);
+                r.setNamaPenanggungJawab("");
+                ruanganRepo.update(r);
+                return;
+            }
+        }
+    }
 }
