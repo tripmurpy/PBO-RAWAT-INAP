@@ -94,7 +94,7 @@ Struktur kelas menggunakan hierarki yang ketat untuk reusability:
 | Folder / File | Deskripsi & Fungsi |
 | :--- | :--- |
 | 📁 `src/model` | Berisi kelas entitas data (Pasien, Dokter, Kamar, dll). |
-| 📁 `src/ui` | Berisi seluruh layar aplikasi dan komponen UI kustom. |
+| 📁 `src/util/ui` | Berisi seluruh layar aplikasi dan komponen UI kustom. |
 | 📁 `src/storage` | Layer akses data yang berinteraksi langsung dengan RMS. |
 | 📁 `src/service` | Berisi logika bisnis (AuthService, PasienService). |
 | 📁 `src/controller` | Mengatur navigasi antar layar dan alur logika aplikasi. |
@@ -130,6 +130,13 @@ Bagian ini merangkum serangkaian perbaikan, optimasi, dan penambahan fitur yang 
 ### 5. Pembersihan & Arsitektur
 *   **Analisis Dead Code**: Identifikasi modul-modul lama yang tidak terpakai (Laporan lama, Obat, Admisi UI lama) untuk langkah optimalisasi ukuran JAR di masa mendatang.
 *   **Backward Compatibility**: Implementasi pengecekan `available()` pada stream data untuk memastikan sistem tetap bisa membaca data lama meskipun ada penambahan field baru pada model.
+
+### 6. Implementasi Pasien Keluar & Penagihan (Update 10 Mei 2026)
+*   **Sistem Discharge Lengkap**: Implementasi alur kepulangan pasien yang mencakup kalkulasi biaya otomatis, pelepasan kamar (room release), dan update riwayat kunjungan.
+*   **Custom Payment UI**: Layar pembayaran baru dengan dukungan metode Cash, QRIS, dan Kartu (Debit/Kredit) lengkap dengan selektor Bank.
+*   **Billing Real-time**: Fitur input manual "Lama Inap" di layar pembayaran yang secara otomatis menghitung ulang (recalculate) biaya total secara instan.
+*   **Feedback Visual Premium**: Penambahan `LunasAnimationScreen` dengan efek checkmark dan sparkle gold sebagai konfirmasi pembayaran sukses.
+*   **Refactoring UI Layer**: Reorganisasi struktur file dengan memindahkan seluruh komponen UI ke dalam package `util.ui` untuk memisahkan logika bisnis dan presentasi dengan lebih baik.
 
 ---
 <p align="center">
