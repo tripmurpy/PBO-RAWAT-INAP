@@ -1,114 +1,73 @@
 package util.ui;
-/*
- * Copyright (c) 2026 tripmurpy/PBO-RAWAT-INAP
- */
 
 import javax.microedition.lcdui.*;
-import java.util.Vector;
-import service.RuanganService;
-import model.Ruangan;
 import util.ServiceFactory;
 
 /**
- * RuanganFormScreen — Form penambahan ruangan baru.
+ * RuanganFormScreen — Form tambah ruangan baru.
  * INHERITANCE: Extends Form.
- * POLYMORPHISM: CommandListener.
  */
 public class RuanganFormScreen extends Form implements CommandListener {
 
-    private RuanganService service;
-    private StringItem siStatus;
-    private TextField tfNama;
+    private TextField tfNama, tfLantai, tfHarga, tfFasilitas;
     private ChoiceGroup cgTipe;
-    private TextField tfKapasitas;
-    private Command cmdTambah, cmdRefresh, cmdKembali;
+    private Command cmdSimpan, cmdBatal;
 
     public RuanganFormScreen() {
-        super("TAMBAH KAMAR BARU");
-        this.service = ServiceFactory.getInstance().getRuanganService();
+        super("TAMBAH RUANGAN");
 
-        siStatus = new StringItem("", "");
-        muatStatusKamar();
-
-        append(siStatus);
-        append(new StringItem("", "\n--- Tambah Kamar Baru ---"));
-
-        tfNama = new TextField("Nama/Nomor Kamar", "", 20, TextField.ANY);
-        cgTipe = new ChoiceGroup("Tipe Kamar", ChoiceGroup.EXCLUSIVE);
+        tfNama = new TextField("Nama Ruangan", "", 10, TextField.ANY);
+        cgTipe = new ChoiceGroup("Tipe Kamar", ChoiceGroup.POPUP);
         cgTipe.append("VIP", null);
+        cgTipe.append("VVIP", null);
         cgTipe.append("Kelas I", null);
         cgTipe.append("Kelas II", null);
         cgTipe.append("Kelas III", null);
-        tfKapasitas = new TextField("Kapasitas", "1", 3, TextField.NUMERIC);
+        
+        tfLantai = new TextField("Lantai", "1", 2, TextField.NUMERIC);
+        tfHarga = new TextField("Harga Per Malam (Rp)", "0", 15, TextField.NUMERIC);
+        tfFasilitas = new TextField("Fasilitas", "", 100, TextField.ANY);
 
         append(tfNama);
         append(cgTipe);
-        append(tfKapasitas);
+        append(tfLantai);
+        append(tfHarga);
+        append(tfFasilitas);
 
-        cmdTambah = new Command("Tambah", Command.OK, 1);
-        cmdRefresh = new Command("Refresh", Command.SCREEN, 2);
-        cmdKembali = new Command("Kembali", Command.BACK, 3);
-        addCommand(cmdTambah);
-        addCommand(cmdRefresh);
-        addCommand(cmdKembali);
+        cmdSimpan = new Command("Simpan", Command.OK, 1);
+        cmdBatal = new Command("Batal", Command.BACK, 2);
+        addCommand(cmdSimpan);
+        addCommand(cmdBatal);
         setCommandListener(this);
     }
 
-    private void muatStatusKamar() {
-        try {
-            Vector list = service.getSemuaRuangan();
-            int[] stat = service.hitungStatistik();
-            StringBuffer sb = new StringBuffer();
-            sb.append("=== STATUS KAMAR ===\n\n");
-
-            if (list.size() == 0) {
-                sb.append("Belum ada data kamar.\n");
-            } else {
-                for (int i = 0; i < list.size(); i++) {
-                    Ruangan r = (Ruangan) list.elementAt(i);
-                    String status = r.isKosong() ? "KOSONG  \u2713" : 
-                                    new StringBuffer().append("TERISI (").append(r.getNamaPasien()).append(")").toString();
-                    sb.append(" ").append(r.getNamaRuangan()).append(" : ").append(status).append("\n");
-                }
-                sb.append("\n Total Terisi : ").append(stat[1]).append(" / ").append(stat[0]);
-                sb.append("\n Total Kosong : ").append(stat[2]).append(" / ").append(stat[0]);
-            }
-            siStatus.setText(sb.toString());
-        } catch (Exception e) {
-            siStatus.setText(new StringBuffer().append("Error: ").append(e.getMessage()).toString());
+    public void commandAction(Command c, Displayable d) {
+        if (c == cmdBatal) {
+            ScreenManager.getInstance().kembali();
+        } else if (c == cmdSimpan) {
+            prosesSimpan();
         }
     }
 
-    public void commandAction(Command c, Displayable d) {
-        if (c == cmdKembali) {
+    private void prosesSimpan() {
+        try {
+            String nama = tfNama.getString();
+            String tipe = cgTipe.getString(cgTipe.getSelectedIndex());
+            int lantai = Integer.parseInt(tfLantai.getString());
+            double harga = Double.parseDouble(tfHarga.getString());
+            String fasilitas = tfFasilitas.getString();
+
+            ServiceFactory.getInstance().getRuanganService().tambahRuangan(nama, tipe, lantai, harga, fasilitas);
+
+            Alert alert = new Alert("BERHASIL", "Ruangan " + nama + " berhasil ditambahkan.", null, AlertType.CONFIRMATION);
+            alert.setTimeout(2000);
+            ScreenManager.getInstance().getDisplay().setCurrent(alert);
             ScreenManager.getInstance().kembali();
-        } else if (c == cmdRefresh) {
-            muatStatusKamar();
-        } else if (c == cmdTambah) {
-            try {
-                String[] tipeArr = {"VIP", "Kelas I", "Kelas II", "Kelas III"};
-                String tipe = tipeArr[cgTipe.getSelectedIndex()];
-                int kap = Integer.parseInt(tfKapasitas.getString());
 
-                Ruangan r = service.tambahRuangan(tfNama.getString(), tipe, kap);
-
-                Alert alert = new Alert("BERHASIL",
-                    new StringBuffer().append("Kamar berhasil ditambahkan!\n").append(r.getNamaRuangan())
-                    .append(" (").append(r.getTipeKamar()).append(")").toString(),
-                    null, AlertType.CONFIRMATION);
-                alert.setTimeout(3000);
-
-                muatStatusKamar();
-                tfNama.setString("");
-                tfKapasitas.setString("1");
-
-                ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
-            } catch (Exception e) {
-                Alert alert = new Alert("ERROR", e.getMessage(), null, AlertType.ERROR);
-                alert.setTimeout(3000);
-                ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
-            }
+        } catch (Exception e) {
+            Alert alert = new Alert("ERROR", e.getMessage(), null, AlertType.ERROR);
+            alert.setTimeout(3000);
+            ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
         }
     }
 }
-

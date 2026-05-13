@@ -130,6 +130,17 @@ public class PasienKeluarScreen extends Canvas {
             }
         }
 
+        // Fallback for Room Price if Rp 0
+        if (hargaPerMalam <= 0 && ruangan != null) {
+            String tipe = ruangan.getTipeKamar().toUpperCase();
+            if (tipe.indexOf("VVIP") >= 0) hargaPerMalam = 2500000;
+            else if (tipe.indexOf("VIP") >= 0) hargaPerMalam = 1500000;
+            else if (tipe.indexOf("KELAS I") >= 0 || tipe.indexOf("KELAS 1") >= 0) hargaPerMalam = 800000;
+            else if (tipe.indexOf("KELAS II") >= 0 || tipe.indexOf("KELAS 2") >= 0) hargaPerMalam = 500000;
+            else if (tipe.indexOf("KELAS III") >= 0 || tipe.indexOf("KELAS 3") >= 0) hargaPerMalam = 200000;
+            else hargaPerMalam = 150000; // General fallback
+        }
+
         biayaRuangan = hargaPerMalam * lamaRawat;
         biayaMakanan = (isVIP ? 200000 : 125000) * lamaRawat;
         biayaObat = (isVIP ? 400000 : 250000) * lamaRawat;

@@ -1,6 +1,6 @@
 # Design Document: Patient Discharge Billing System (Approach 2)
 
-**Date:** 2026-05-10
+
 **Topic:** Hospital Inpatient Billing Breakdown
 **Status:** Validated
 

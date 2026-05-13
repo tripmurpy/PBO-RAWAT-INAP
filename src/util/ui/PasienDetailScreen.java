@@ -12,9 +12,7 @@ import java.util.Vector;
 
 /**
  * PasienDetailScreen — Menampilkan detail lengkap data pasien.
- * 
  * INHERITANCE: Extends Canvas (J2ME LCDUI).
- * Menampilkan kartu detail pasien dengan info dokter dan ruangan.
  */
 public class PasienDetailScreen extends Canvas {
 
@@ -24,11 +22,10 @@ public class PasienDetailScreen extends Canvas {
     private int scrollY = 0;
     private int contentHeight = 0;
 
-    // Posisi tombol Pasien Keluar (untuk deteksi tap)
     private int btnKeluarX, btnKeluarY, btnKeluarW, btnKeluarH;
     private boolean showBtnKeluar = false;
 
-    // Warna — Clean minimal palette
+    // Pro Colors
     private static final int WARNA_BG = 0xF0F4F8;
     private static final int WARNA_CARD = 0xFFFFFF;
     private static final int WARNA_HEADER = 0x1A1A2E;
@@ -45,8 +42,6 @@ public class PasienDetailScreen extends Canvas {
     private static final int WARNA_DOKTER_BORDER = 0x3498DB;
     private static final int WARNA_RUANGAN_BG = 0xFDF2E9;
     private static final int WARNA_RUANGAN_BORDER = 0xE67E22;
-    private static final int WARNA_BADGE_BG = 0xE8F8F5;
-    private static final int WARNA_BADGE_TEKS = 0x1ABC9C;
 
     public PasienDetailScreen(Pasien pasien) {
         this.pasien = pasien;
@@ -54,44 +49,26 @@ public class PasienDetailScreen extends Canvas {
         muatDataTerkait();
     }
 
-    /**
-     * Memuat data dokter dan ruangan terkait pasien.
-     */
     private void muatDataTerkait() {
-        // Cari dokter berdasarkan nama yang disimpan di pasien
         String namaDokter = pasien.getDokterPenanggungJawab();
         if (namaDokter != null && namaDokter.length() > 0) {
             try {
-                DokterService ds = ServiceFactory.getInstance().getDokterService();
-                Vector semuaDokter = ds.getSemuaDokter();
-                for (int i = 0; i < semuaDokter.size(); i++) {
-                    Dokter d = (Dokter) semuaDokter.elementAt(i);
-                    if (d.getNama().equals(namaDokter)) {
-                        this.dokter = d;
-                        break;
-                    }
+                Vector v = ServiceFactory.getInstance().getDokterService().getSemuaDokter();
+                for (int i = 0; i < v.size(); i++) {
+                    Dokter d = (Dokter) v.elementAt(i);
+                    if (d.getNama().equals(namaDokter)) { this.dokter = d; break; }
                 }
-            } catch (Exception e) {
-                // Gagal memuat data dokter — lanjut tanpa
-            }
+            } catch (Exception e) {}
         }
-
-        // Cari ruangan berdasarkan nama kamar yang disimpan di pasien
         String namaKamar = pasien.getKamarRawat();
         if (namaKamar != null && namaKamar.length() > 0) {
             try {
-                RuanganService rs = ServiceFactory.getInstance().getRuanganService();
-                Vector semuaRuangan = rs.getSemuaRuangan();
-                for (int i = 0; i < semuaRuangan.size(); i++) {
-                    Ruangan r = (Ruangan) semuaRuangan.elementAt(i);
-                    if (r.getNamaRuangan().equals(namaKamar)) {
-                        this.ruangan = r;
-                        break;
-                    }
+                Vector v = ServiceFactory.getInstance().getRuanganService().getSemuaRuangan();
+                for (int i = 0; i < v.size(); i++) {
+                    Ruangan r = (Ruangan) v.elementAt(i);
+                    if (r.getNamaRuangan().equals(namaKamar)) { this.ruangan = r; break; }
                 }
-            } catch (Exception e) {
-                // Gagal memuat data ruangan — lanjut tanpa
-            }
+            } catch (Exception e) {}
         }
     }
 
@@ -100,26 +77,19 @@ public class PasienDetailScreen extends Canvas {
         int h = getHeight();
 
         Font fontBesar = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_LARGE);
-        Font fontSedang = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
         Font fontSedangBold = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
         Font fontKecil = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_SMALL);
         Font fontKecilBold = Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_BOLD, Font.SIZE_SMALL);
 
-        // Background
         g.setColor(WARNA_BG);
         g.fillRect(0, 0, w, h);
 
-        // === TOP BAR ===
         int barH = 38;
         g.setColor(WARNA_HEADER);
         g.fillRect(0, 0, w, barH);
-
         g.setColor(WARNA_TEKS_TERANG);
         g.setFont(fontSedangBold);
-        g.drawString("Detail Pasien", w / 2, (barH - fontSedangBold.getHeight()) / 2,
-                Graphics.TOP | Graphics.HCENTER);
-
-        // Back indicator
+        g.drawString("Detail Pasien", w / 2, (barH - fontSedangBold.getHeight()) / 2, Graphics.TOP | Graphics.HCENTER);
         g.setFont(fontKecil);
         g.drawString("<", 10, (barH - fontKecil.getHeight()) / 2, Graphics.TOP | Graphics.LEFT);
 
@@ -127,301 +97,105 @@ public class PasienDetailScreen extends Canvas {
         int cardW = w - (margin * 2);
         int y = barH + 8 - scrollY;
 
-        // ======================================================
-        // CARD 1: Identitas Pasien (main card)
-        // ======================================================
-        int card1StartY = y;
-        int card1ContentH = 0;
-
-        // Avatar circle + Name section
-        int avatarSize = 40;
-        int nameSecH = avatarSize + 16;
-        card1ContentH += nameSecH;
-
-        // Info rows: NoRM, TTL, JK, Alamat, Telp, Asuransi = 6 rows
+        // CARD 1: Identitas
         int rowH = fontKecil.getHeight() + 8;
-        int infoRows = 6;
-        card1ContentH += (rowH * infoRows) + 8; // +8 padding
-        // Status badge
-        card1ContentH += 20;
+        int infoRows = 9; // Added 2 for Wali info
+        int card1H = 60 + (rowH * infoRows) + 20;
 
-        int card1H = card1ContentH + 12;
-
-        // Draw card background
         g.setColor(WARNA_CARD);
         g.fillRoundRect(margin, y, cardW, card1H, 10, 10);
 
-        int cx = margin + 12; // content x
-        int cw = cardW - 24; // content width
-        y += 10;
-
-        // --- Avatar circle ---
-        int avatarX = cx;
-        int avatarY = y;
+        int cx = margin + 12;
+        int cw = cardW - 24;
+        
         g.setColor(WARNA_AKSEN);
-        g.fillRoundRect(avatarX, avatarY, avatarSize, avatarSize, avatarSize, avatarSize);
-
-        // Initial letter in avatar
+        g.fillRoundRect(cx, y + 10, 40, 40, 40, 40);
         g.setColor(WARNA_TEKS_TERANG);
         g.setFont(fontBesar);
-        String initial = pasien.getNama() != null && pasien.getNama().length() > 0
-                ? pasien.getNama().substring(0, 1).toUpperCase()
-                : "?";
-        g.drawString(initial, avatarX + avatarSize / 2,
-                avatarY + (avatarSize - fontBesar.getHeight()) / 2,
-                Graphics.TOP | Graphics.HCENTER);
+        g.drawString(pasien.getNama().substring(0, 1).toUpperCase(), cx + 20, y + 10 + (40 - fontBesar.getHeight()) / 2, Graphics.TOP | Graphics.HCENTER);
 
-        // --- Name + Status beside avatar ---
-        int nameX = avatarX + avatarSize + 10;
         g.setColor(WARNA_TEKS);
         g.setFont(fontSedangBold);
-        g.drawString(pasien.getNama() != null ? pasien.getNama() : "-", nameX, avatarY + 2,
-                Graphics.TOP | Graphics.LEFT);
-
-        // NoRM below name
+        g.drawString(pasien.getNama(), cx + 50, y + 12, Graphics.TOP | Graphics.LEFT);
         g.setColor(WARNA_TEKS_REDUP);
         g.setFont(fontKecil);
-        g.drawString(new StringBuffer().append("No. RM: ").append(
-                pasien.getNoRM() != null ? pasien.getNoRM() : "-").toString(),
-                nameX, avatarY + fontSedangBold.getHeight() + 4,
-                Graphics.TOP | Graphics.LEFT);
+        g.drawString("No. RM: " + pasien.getNoRM(), cx + 50, y + 12 + fontSedangBold.getHeight() + 2, Graphics.TOP | Graphics.LEFT);
 
-        // Status badge below NoRM
-        String statusText = pasien.getStatus() != null ? pasien.getStatus() : "AKTIF";
-        int statusColor;
-        if (Pasien.STATUS_DIRAWAT.equals(statusText)) {
-            statusColor = WARNA_STATUS_DIRAWAT;
-        } else if (Pasien.STATUS_PULANG.equals(statusText)) {
-            statusColor = WARNA_STATUS_PULANG;
-        } else {
-            statusColor = WARNA_STATUS_AKTIF;
-        }
-        int badgeW = fontKecil.stringWidth(statusText) + 14;
-        int badgeH = fontKecil.getHeight() + 4;
-        int badgeY = avatarY + fontSedangBold.getHeight() + fontKecil.getHeight() + 6;
-        g.setColor(statusColor);
-        g.fillRoundRect(nameX, badgeY, badgeW, badgeH, badgeH, badgeH);
-        g.setColor(WARNA_TEKS_TERANG);
-        g.setFont(fontKecil);
-        g.drawString(statusText, nameX + 7, badgeY + 2, Graphics.TOP | Graphics.LEFT);
-
-        y = avatarY + avatarSize + 14;
-
-        // --- Divider ---
+        int curY = y + 60;
         g.setColor(WARNA_GARIS);
-        g.drawLine(cx, y, cx + cw, y);
-        y += 6;
+        g.drawLine(cx, curY, cx + cw, curY);
+        curY += 8;
 
-        // --- Info rows ---
-        y = drawInfoRow(g, fontKecilBold, fontKecil, cx, cw, y, "Tanggal Lahir",
-                pasien.getTglLahir() > 0 ? DateUtil.formatTanggal(pasien.getTglLahir()) : "-");
-        y = drawInfoRow(g, fontKecilBold, fontKecil, cx, cw, y, "Jenis Kelamin",
-                safeStr(pasien.getJenisKelamin(), "-"));
-        y = drawInfoRow(g, fontKecilBold, fontKecil, cx, cw, y, "Alamat",
-                safeStr(pasien.getAlamat(), "-"));
-        y = drawInfoRow(g, fontKecilBold, fontKecil, cx, cw, y, "Telepon",
-                safeStr(pasien.getNoTelp(), "-"));
-        y = drawInfoRow(g, fontKecilBold, fontKecil, cx, cw, y, "Asuransi",
-                safeStr(pasien.getAsuransi(), "-"));
+        curY = drawRow(g, fontKecilBold, fontKecil, cx, cw, curY, "Tgl Lahir", DateUtil.formatTanggal(pasien.getTglLahir()));
+        curY = drawRow(g, fontKecilBold, fontKecil, cx, cw, curY, "Gender", pasien.getJenisKelamin());
+        curY = drawRow(g, fontKecilBold, fontKecil, cx, cw, curY, "Alamat", pasien.getAlamat());
+        curY = drawRow(g, fontKecilBold, fontKecil, cx, cw, curY, "Telepon", pasien.getNoTelp());
+        curY = drawRow(g, fontKecilBold, fontKecil, cx, cw, curY, "Nama Wali", pasien.getNamaWali());
+        curY = drawRow(g, fontKecilBold, fontKecil, cx, cw, curY, "Telp Wali", pasien.getNoTelpWali());
+        curY = drawRow(g, fontKecilBold, fontKecil, cx, cw, curY, "Asuransi", pasien.getAsuransi());
+        curY = drawRow(g, fontKecilBold, fontKecil, cx, cw, curY, "Keluhan", pasien.getKeluhan());
+        curY = drawRow(g, fontKecilBold, fontKecil, cx, cw, curY, "Status", pasien.getStatus());
 
-        y += 6; // end padding of card 1
+        y += card1H + 8;
 
-        y = card1StartY + card1H + 8;
-
-        // ======================================================
-        // CARD 2: Dokter Penanggung Jawab
-        // ======================================================
-        int card2H;
-        if (dokter != null) {
-            card2H = 70;
-        } else {
-            card2H = 44;
-        }
-
-        // Card background with left border accent
+        // CARD 2: Dokter
+        int card2H = 50;
         g.setColor(WARNA_DOKTER_BG);
-        g.fillRoundRect(margin, y, cardW, card2H, 10, 10);
-        // Left accent bar
+        g.fillRoundRect(margin, y, cardW, card2H, 8, 8);
         g.setColor(WARNA_DOKTER_BORDER);
-        g.fillRoundRect(margin, y, 4, card2H, 4, 4);
-
-        int dcy = y + 8;
-        g.setColor(WARNA_DOKTER_BORDER);
+        g.fillRect(margin, y, 4, card2H);
         g.setFont(fontKecilBold);
-        g.drawString("Dokter Penanggung Jawab", cx + 4, dcy, Graphics.TOP | Graphics.LEFT);
-        dcy += fontKecilBold.getHeight() + 4;
-
-        if (dokter != null) {
-            g.setColor(WARNA_TEKS);
-            g.setFont(fontSedangBold);
-            g.drawString(new StringBuffer().append("dr. ").append(dokter.getNama()).toString(),
-                    cx + 4, dcy, Graphics.TOP | Graphics.LEFT);
-            dcy += fontSedangBold.getHeight() + 2;
-
-            g.setColor(WARNA_LABEL);
-            g.setFont(fontKecil);
-            StringBuffer spBuf = new StringBuffer();
-            spBuf.append("Sp. ").append(dokter.getSpesialisasi());
-            if (dokter.getJadwal() != null && dokter.getJadwal().length() > 0
-                    && !dokter.getJadwal().equals("-")) {
-                spBuf.append(" | ").append(dokter.getJadwal());
-            }
-            g.drawString(spBuf.toString(), cx + 4, dcy, Graphics.TOP | Graphics.LEFT);
-        } else {
-            g.setColor(WARNA_TEKS_REDUP);
-            g.setFont(fontKecil);
-            String dLabel = safeStr(pasien.getDokterPenanggungJawab(), "");
-            if (dLabel.length() > 0) {
-                g.drawString(dLabel, cx + 4, dcy, Graphics.TOP | Graphics.LEFT);
-            } else {
-                g.drawString("Belum ditentukan", cx + 4, dcy, Graphics.TOP | Graphics.LEFT);
-            }
-        }
+        g.drawString("Dokter Penanggung Jawab", cx + 4, y + 6, Graphics.TOP | Graphics.LEFT);
+        g.setColor(WARNA_TEKS);
+        g.setFont(fontKecil);
+        g.drawString(pasien.getDokterPenanggungJawab(), cx + 4, y + 6 + fontKecilBold.getHeight() + 4, Graphics.TOP | Graphics.LEFT);
 
         y += card2H + 8;
 
-        // ======================================================
-        // CARD 3: Ruangan / Kamar
-        // ======================================================
-        int card3H;
-        if (ruangan != null) {
-            card3H = 70;
-        } else {
-            card3H = 44;
-        }
-
+        // CARD 3: Ruangan
+        int card3H = 50;
         g.setColor(WARNA_RUANGAN_BG);
-        g.fillRoundRect(margin, y, cardW, card3H, 10, 10);
-        // Left accent bar
+        g.fillRoundRect(margin, y, cardW, card3H, 8, 8);
         g.setColor(WARNA_RUANGAN_BORDER);
-        g.fillRoundRect(margin, y, 4, card3H, 4, 4);
-
-        int rcy = y + 8;
-        g.setColor(WARNA_RUANGAN_BORDER);
+        g.fillRect(margin, y, 4, card3H);
         g.setFont(fontKecilBold);
-        g.drawString("Ruangan / Kamar", cx + 4, rcy, Graphics.TOP | Graphics.LEFT);
-        rcy += fontKecilBold.getHeight() + 4;
+        g.drawString("Ruangan / Kamar", cx + 4, y + 6, Graphics.TOP | Graphics.LEFT);
+        g.setColor(WARNA_TEKS);
+        g.setFont(fontKecil);
+        String rInfo = pasien.getKamarRawat();
+        if (ruangan != null) rInfo += " (" + ruangan.getTipeKamar() + ") - Rp " + formatHarga(ruangan.getHarga());
+        g.drawString(rInfo, cx + 4, y + 6 + fontKecilBold.getHeight() + 4, Graphics.TOP | Graphics.LEFT);
 
-        if (ruangan != null) {
-            g.setColor(WARNA_TEKS);
-            g.setFont(fontSedangBold);
-            g.drawString(ruangan.getNamaRuangan(), cx + 4, rcy, Graphics.TOP | Graphics.LEFT);
-            rcy += fontSedangBold.getHeight() + 2;
+        y += card3H + 12;
 
-            g.setColor(WARNA_LABEL);
-            g.setFont(fontKecil);
-            StringBuffer rBuf = new StringBuffer();
-            rBuf.append(ruangan.getTipeKamar());
-            if (ruangan.getHarga() > 0) {
-                rBuf.append(" | Rp ").append(formatHarga(ruangan.getHarga()));
-                rBuf.append("/malam");
-            }
-            g.drawString(rBuf.toString(), cx + 4, rcy, Graphics.TOP | Graphics.LEFT);
-        } else {
-            g.setColor(WARNA_TEKS_REDUP);
-            g.setFont(fontKecil);
-            String kLabel = safeStr(pasien.getKamarRawat(), "");
-            if (kLabel.length() > 0) {
-                g.drawString(kLabel, cx + 4, rcy, Graphics.TOP | Graphics.LEFT);
-            } else {
-                g.drawString("Belum ditentukan", cx + 4, rcy, Graphics.TOP | Graphics.LEFT);
-            }
-        }
-
-        y += card3H + 8;
-
-        // ======================================================
-        // BUTTON: Pasien Keluar (hanya jika belum PULANG)
-        // ======================================================
-        String currentStatus = pasien.getStatus() != null ? pasien.getStatus() : "AKTIF";
-        if (!Pasien.STATUS_PULANG.equals(currentStatus)) {
+        // BUTTON: Discharge
+        if (!Pasien.STATUS_PULANG.equals(pasien.getStatus())) {
             showBtnKeluar = true;
-            int btnH = 40;
-            int btnW = cardW;
-            int btnX = margin;
-            int btnY = y;
-
-            // Store for tap detection
-            this.btnKeluarX = btnX;
-            this.btnKeluarY = btnY;
-            this.btnKeluarW = btnW;
-            this.btnKeluarH = btnH;
-
-            // Red gradient button
+            btnKeluarX = margin; btnKeluarY = y; btnKeluarW = cardW; btnKeluarH = 40;
             g.setColor(0xE74C3C);
-            g.fillRoundRect(btnX, btnY, btnW, btnH, 12, 12);
-            // Darker bottom edge for depth
-            g.setColor(0xC0392B);
-            g.fillRoundRect(btnX, btnY + btnH - 8, btnW, 8, 0, 0);
-            g.fillRoundRect(btnX, btnY + btnH - 12, btnW, 12, 12, 12);
-            // Recolor main area
-            g.setColor(0xE74C3C);
-            g.fillRoundRect(btnX, btnY, btnW, btnH - 6, 12, 12);
-
-            // Button text
+            g.fillRoundRect(btnKeluarX, btnKeluarY, btnKeluarW, btnKeluarH, 10, 10);
             g.setColor(WARNA_TEKS_TERANG);
             g.setFont(fontSedangBold);
-            g.drawString("PASIEN KELUAR", btnX + btnW / 2,
-                    btnY + (btnH - fontSedangBold.getHeight()) / 2 - 2,
-                    Graphics.TOP | Graphics.HCENTER);
-
-            y += btnH + 10;
+            g.drawString("PASIEN KELUAR", btnKeluarX + btnKeluarW / 2, btnKeluarY + 10, Graphics.TOP | Graphics.HCENTER);
+            y += 50;
         } else {
             showBtnKeluar = false;
-            // Tampilkan badge SUDAH PULANG
-            int badgeW2 = fontSedangBold.stringWidth("SUDAH PULANG") + 20;
-            int badgeH2 = fontSedangBold.getHeight() + 10;
-            int badgeX2 = margin + (cardW - badgeW2) / 2;
-            g.setColor(WARNA_STATUS_PULANG);
-            g.fillRoundRect(badgeX2, y, badgeW2, badgeH2, badgeH2, badgeH2);
-            g.setColor(WARNA_TEKS_TERANG);
-            g.setFont(fontSedangBold);
-            g.drawString("SUDAH PULANG", badgeX2 + badgeW2 / 2,
-                    y + 5, Graphics.TOP | Graphics.HCENTER);
-            y += badgeH2 + 10;
         }
 
-        // Store total content height for scrolling
-        this.contentHeight = y + scrollY;
-
-        // === FOOTER ===
-        g.setColor(WARNA_CARD);
-        g.fillRect(0, h - 22, w, 22);
-        g.setColor(WARNA_TEKS_REDUP);
-        g.setFont(fontKecil);
-        g.drawString("Tekan * untuk kembali", w / 2, h - 18,
-                Graphics.TOP | Graphics.HCENTER);
+        contentHeight = y + scrollY;
     }
 
-    /**
-     * Draw a label: value row.
-     */
-    private int drawInfoRow(Graphics g, Font fontLabel, Font fontValue,
-                            int x, int width, int y, String label, String value) {
-        g.setColor(WARNA_LABEL);
-        g.setFont(fontLabel);
-        g.drawString(label, x, y, Graphics.TOP | Graphics.LEFT);
-
-        g.setColor(WARNA_TEKS);
-        g.setFont(fontValue);
-        g.drawString(value, x + width / 2, y, Graphics.TOP | Graphics.LEFT);
-
-        return y + fontLabel.getHeight() + 6;
-    }
-
-    private String safeStr(String s, String def) {
-        return (s != null && s.length() > 0) ? s : def;
+    private int drawRow(Graphics g, Font fL, Font fV, int x, int w, int y, String label, String val) {
+        g.setColor(WARNA_LABEL); g.setFont(fL); g.drawString(label, x, y, Graphics.TOP | Graphics.LEFT);
+        g.setColor(WARNA_TEKS); g.setFont(fV); g.drawString(val != null ? val : "-", x + w / 2, y, Graphics.TOP | Graphics.LEFT);
+        return y + fL.getHeight() + 6;
     }
 
     private String formatHarga(double harga) {
-        long h = (long) harga;
-        String s = String.valueOf(h);
+        String s = String.valueOf((long) harga);
         StringBuffer sb = new StringBuffer();
-        int len = s.length();
-        for (int i = 0; i < len; i++) {
-            if (i > 0 && (len - i) % 3 == 0) {
-                sb.append('.');
-            }
+        for (int i = 0; i < s.length(); i++) {
+            if (i > 0 && (s.length() - i) % 3 == 0) sb.append('.');
             sb.append(s.charAt(i));
         }
         return sb.toString();
@@ -429,56 +203,19 @@ public class PasienDetailScreen extends Canvas {
 
     protected void keyPressed(int keyCode) {
         int action = getGameAction(keyCode);
-        int h = getHeight();
-
-        if (action == Canvas.UP) {
-            scrollY = Math.max(0, scrollY - 30);
-        } else if (action == Canvas.DOWN) {
-            int maxScroll = contentHeight - h;
-            if (maxScroll > 0) {
-                scrollY = Math.min(maxScroll, scrollY + 30);
-            }
-        } else if (keyCode == Canvas.KEY_STAR) {
-            ScreenManager.getInstance().kembali();
-            return;
-        } else if (action == Canvas.FIRE) {
-            // FIRE → buka Pasien Keluar jika tersedia
-            if (showBtnKeluar) {
-                bukaPasienKeluar();
-                return;
-            }
-            ScreenManager.getInstance().kembali();
-            return;
-        }
+        if (action == Canvas.UP) scrollY = Math.max(0, scrollY - 30);
+        else if (action == Canvas.DOWN) scrollY = Math.min(contentHeight - getHeight(), scrollY + 30);
+        else if (keyCode == Canvas.KEY_STAR) ScreenManager.getInstance().kembali();
+        else if (action == Canvas.FIRE && showBtnKeluar) bukaPasienKeluar();
         repaint();
     }
 
     protected void pointerPressed(int px, int py) {
-        int w = getWidth();
-        // Back button area (top-left)
-        if (py < 38 && px < 50) {
-            ScreenManager.getInstance().kembali();
-            return;
-        }
-        // Footer area tap => go back
-        if (py > getHeight() - 22) {
-            ScreenManager.getInstance().kembali();
-            return;
-        }
-        // Cek tap pada tombol Pasien Keluar (koordinat relatif ke scrollY)
-        if (showBtnKeluar) {
-            int realBtnY = btnKeluarY; // sudah di-render relative to scroll
-            if (px >= btnKeluarX && px <= btnKeluarX + btnKeluarW
-                    && py >= realBtnY && py <= realBtnY + btnKeluarH) {
-                bukaPasienKeluar();
-                return;
-            }
-        }
+        if (py < 38) ScreenManager.getInstance().kembali();
+        else if (showBtnKeluar && px >= btnKeluarX && px <= btnKeluarX + btnKeluarW && py >= btnKeluarY && py <= btnKeluarY + btnKeluarH) bukaPasienKeluar();
     }
 
-    /** Navigasi ke layar Pasien Keluar (form pembayaran). */
     private void bukaPasienKeluar() {
-        ScreenManager.getInstance().tampilkanLayar(
-                new PasienKeluarScreen(pasien, dokter, ruangan));
+        ScreenManager.getInstance().tampilkanLayar(new PasienKeluarScreen(pasien, dokter, ruangan));
     }
 }

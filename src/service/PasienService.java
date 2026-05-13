@@ -26,11 +26,12 @@ public class PasienService {
     public Pasien daftarPasienBaru(String nama, String tglLahirStr,
             String jenisKelamin, String alamat, 
             String noTelp, String asuransi,
-            String dokter, String kamar) throws Exception {
+            String dokter, String kamar, String keluhan,
+            String namaWali, String noTelpWali) throws Exception {
 
         // Validasi input
         String error = Validator.validasiPasien(nama, tglLahirStr, 
-                                                 jenisKelamin, alamat, noTelp);
+                                                 jenisKelamin, alamat, noTelp, keluhan);
         if (error != null) {
             throw new Exception(error);
         }
@@ -44,9 +45,11 @@ public class PasienService {
         // Buat objek pasien
         Pasien pasien = new Pasien(noRM, nama.trim(), tglLahir,
                                     jenisKelamin, alamat.trim(), 
-                                    noTelp.trim(), asuransi);
+                                    noTelp.trim(), asuransi,
+                                    namaWali.trim(), noTelpWali.trim());
         pasien.setDokterPenanggungJawab(dokter);
         pasien.setKamarRawat(kamar);
+        pasien.setKeluhan(keluhan);
 
         // Simpan
         pasienRepo.save(pasien);

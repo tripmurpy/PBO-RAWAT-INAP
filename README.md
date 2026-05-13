@@ -63,17 +63,72 @@ Aplikasi ini dibangun murni menggunakan standar **Java ME (J2ME)** tanpa library
 *   **Record Management System (RMS)**: Menggunakan database internal J2ME untuk menyimpan data secara lokal dalam bentuk byte stream yang diindeks.
 
 ### 3.4 Penerapan OOP: Inheritance (Pewarisan)
-Struktur kelas menggunakan hierarki yang ketat untuk reusability:
-*   `Pasien`, `Dokter`, dan `Perawat` mewarisi properti dasar dari kelas abstract `Person`.
-*   `Person` mewarisi identitas unik dari kelas root `Entity`.
+Inheritance adalah konsep di mana sebuah kelas (subclass) mewarisi sifat dan perilaku dari kelas lain (superclass). Dalam sistem ini, pewarisan digunakan untuk membangun struktur data yang hierarkis dan menghindari duplikasi kode.
+
+**Contoh Implementasi:**
+1.  **`Pasien` extends `Person`**: Kelas `Pasien` mewarisi atribut dasar seperti `nama`, `tglLahir`, dan `jenisKelamin` dari kelas `Person`.
+2.  **`Person` extends `Entity`**: Kelas `Person` mewarisi atribut `id` dari kelas root `Entity`, sehingga setiap orang di sistem memiliki identitas unik.
+3.  **`PasienFormScreen` extends `Form`**: Kelas UI ini mewarisi seluruh kemampuan form standar dari J2ME (LCDUI), memungkinkan penambahan input seperti TextField secara mudah.
 
 ### 3.5 Penerapan OOP: Encapsulation (Pengkapsulan)
-*   Semua data member dalam model didefinisikan sebagai `protected` atau `private`.
-*   Akses data dilakukan secara terkontrol melalui metode **Getter** dan **Setter** publik untuk menjaga integritas data.
+Encapsulation adalah teknik untuk menyembunyikan detail implementasi dan melindungi data dengan menjadikan field bersifat private, lalu menyediakan akses melalui method publik (Getter/Setter).
+
+**Contoh Implementasi:**
+1.  **Field Private**: Semua atribut di kelas `Pasien` (seperti `alamat`, `noTelp`, `status`) dideklarasikan sebagai `private`.
+2.  **Getter & Setter**: Akses ke atribut dilakukan melalui method seperti `getNama()` dan `setNama(String nama)`, yang memungkinkan validasi data sebelum disimpan.
+3.  **Akses Terkontrol**: Penggunaan modifier `protected` pada kelas `Entity` memungkinkan subclass mengakses `id` namun tetap tersembunyi dari kelas luar lainnya.
 
 ### 3.6 Penerapan OOP: Polymorphism (Polimorfisme)
-*   **Method Overriding**: Metode `toString()` dan `tampilkan()` diimplementasikan secara berbeda di setiap subclass (Pasien, Kamar, dll) untuk memberikan representasi data yang sesuai konteks.
-*   **Generic Handling**: Penggunaan kelas abstract `Entity` memungkinkan sistem penyimpanan (Storage Layer) menangani berbagai tipe objek secara generik.
+Polymorphism memungkinkan satu interface atau method untuk memiliki banyak bentuk implementasi. Dalam project ini, polimorfisme diimplementasikan melalui method overriding.
+
+**Contoh Implementasi:**
+1.  **Overriding `tampilkan()`**: Method `tampilkan()` di kelas `Person` di-override oleh kelas `Pasien` untuk menambahkan informasi [STATUS] di samping nama.
+2.  **Overriding `paint()`**: Kelas `PasienKeluarScreen` meng-override method `paint(Graphics g)` milik `Canvas` untuk menggambar tampilan invoice kustom yang premium.
+3.  **Generic Interface**: Penggunaan interface `IPasienRepository` memungkinkan controller memanggil method database secara generik tanpa harus tahu detail teknis penyimpanan di RMS.
+
+---
+
+## 🖥️ Penjelasan Antarmuka (UI)
+
+### 1. Form Pendaftaran Pasien
+Form ini menggunakan komponen **High-Level LCDUI** untuk memudahkan input data petugas:
+*   **Nama Pasien & Wali**: Menggunakan `TextField` (Input teks bebas).
+*   **Tanggal Lahir**: Menggunakan `TextField` dengan format validasi YYYY-MM-DD.
+*   **Jenis Kelamin**: Menggunakan `ChoiceGroup` (POPUP) dengan pilihan Laki-laki / Perempuan.
+*   **Alamat**: Menggunakan `TextField` (Input alamat lengkap).
+*   **Nomor Telepon**: Menggunakan `TextField` khusus tipe PHONENUMBER.
+*   **Asuransi**: Menggunakan `ChoiceGroup` (POPUP) berisi daftar provider (BPJS, Cash, dll).
+*   **Dokter Penanggung Jawab**: Menggunakan `ChoiceGroup` yang datanya diambil secara dinamis dari database Dokter.
+*   **Kamar**: Menggunakan `StringItem` interaktif yang akan membuka `KamarSelectionScreen` (Peta Kamar) saat diklik.
+
+### 2. Form Pembayaran (Discharge)
+Tampilan ini menggunakan **Low-Level Canvas** untuk pengalaman pengguna yang lebih modern:
+*   **Kalkulasi Biaya**: Biaya dihitung secara real-time berdasarkan lama inap yang bisa diatur menggunakan tombol navigasi (Kiri/Kanan).
+*   **Metode Pembayaran**: Mendukung **CASH**, **QRIS**, **DEBIT**, dan **KREDIT**.
+*   **Pemilihan Bank**: Jika memilih kartu (Debit/Kredit), sistem menampilkan grid pemilihan bank (BCA, BRI, BNI, Mandiri, dll).
+*   **Efek Visual**: Menggunakan sistem focus border berwarna emas untuk menandai bagian mana yang sedang aktif dipilih.
+
+### 3. Animasi "LUNAS"
+Setelah pembayaran sukses, sistem menampilkan `LunasAnimationScreen`:
+*   **Teknologi**: Menggunakan `java.util.Timer` untuk menjalankan loop animasi pada 20 FPS.
+*   **Visual**: Menampilkan animasi tanda centang (checkmark) yang membesar (scaling), efek gradien hijau yang dinamis, dan dekorasi "Gold Sparkle" untuk memberikan kesan premium.
+
+---
+
+## 📂 Penjelasan Folder & File Project
+Berikut adalah struktur lengkap folder dalam project ini beserta fungsinya:
+
+*   **`src/model`**: Berisi kelas-kelas Blue-print data (POJO).
+    *   `Entity`, `Person`, `Pasien`, `Dokter`, `Ruangan`, `User`.
+*   **`src/model/repository`**: Berisi Interface untuk standar operasi database (Contract).
+*   **`src/controller`**: Menangani logika navigasi dan alur antar layar.
+*   **`src/service`**: Layer logika bisnis utama (Kalkulasi biaya, validasi pendaftaran).
+*   **`src/storage`**: Implementasi penyimpanan permanen menggunakan J2ME **Record Management System (RMS)**.
+*   **`src/util/ui`**: Berisi seluruh komponen visual dan layar aplikasi (Layar utama UI).
+*   **`src/util`**: Helper class untuk pengelolaan tanggal, generator ID, dan data awal (Seed).
+*   **`src/exception`**: Penanganan error kustom (Contoh: Kamar Penuh, Data Tidak Ditemukan).
+*   **`dist/`**: Folder hasil build yang berisi file `.jar` dan `.jad` siap instal.
+*   **`build.xml`**: File konfigurasi utama untuk proses build otomatis menggunakan Apache Ant.
 
 ---
 
@@ -88,20 +143,6 @@ Struktur kelas menggunakan hierarki yang ketat untuk reusability:
 | **Versi Java** | Source 1.3 / Target 1.1 (Bytecode Compatibility) |
 
 ---
-
-## 📂 Struktur Folder & Fungsi File
-
-| Folder / File | Deskripsi & Fungsi |
-| :--- | :--- |
-| 📁 `src/model` | Berisi kelas entitas data (Pasien, Dokter, Kamar, dll). |
-| 📁 `src/util/ui` | Berisi seluruh layar aplikasi dan komponen UI kustom. |
-| 📁 `src/storage` | Layer akses data yang berinteraksi langsung dengan RMS. |
-| 📁 `src/service` | Berisi logika bisnis (AuthService, PasienService). |
-| 📁 `src/controller` | Mengatur navigasi antar layar dan alur logika aplikasi. |
-| 📁 `src/util` | Helper class untuk penanganan Tanggal, ID, dan Seed Data. |
-| 📄 `build.xml` | Skrip otomatisasi build menggunakan Apache Ant. |
-| 📄 `MANIFEST.MF` | Konfigurasi atribut JAR untuk MIDlet. |
-| 📄 `*.jad` | Descriptor file untuk instalasi aplikasi di perangkat/emulator. |
 
 
 ---
@@ -137,6 +178,16 @@ Bagian ini merangkum serangkaian perbaikan, optimasi, dan penambahan fitur yang 
 *   **Billing Real-time**: Fitur input manual "Lama Inap" di layar pembayaran yang secara otomatis menghitung ulang (recalculate) biaya total secara instan.
 *   **Feedback Visual Premium**: Penambahan `LunasAnimationScreen` dengan efek checkmark dan sparkle gold sebagai konfirmasi pembayaran sukses.
 *   **Refactoring UI Layer**: Reorganisasi struktur file dengan memindahkan seluruh komponen UI ke dalam package `util.ui` untuk memisahkan logika bisnis dan presentasi dengan lebih baik.
+
+### 7. Peningkatan Fitur & Refactoring UI (Update 13 Mei 2026)
+*   **Fitur Keluhan Pasien**: Penambahan field "Keluhan" pada model data, form pendaftaran, dan layar detail pasien untuk mencatat keluhan medis utama saat pasien masuk.
+*   **Modernisasi Riwayat Kunjungan**: Redesain total layar riwayat kunjungan menggunakan konsep *modern card-based UI* untuk meningkatkan keterbacaan data pasien.
+*   **Optimalisasi Form Registrasi**:
+    *   Penataan ulang urutan field (Keluhan diletakkan sebelum Pilihan Dokter) untuk alur pengisian data yang lebih logis.
+    *   Migrasi input Asuransi dan DPJP menggunakan `ChoiceGroup` guna meminimalisir kesalahan input manual.
+*   **Bug Fix Data Wali**: Perbaikan pada logika sinkronisasi data yang menyebabkan informasi "Nama Wali" dan "Nomor Wali" tidak tertampil pada ringkasan pasien.
+*   **Analisis Performa Sistem**: Diagnosa dan optimasi proses serialisasi data pada `PasienDB` untuk mengatasi gejala *system lag* pada perangkat dengan spesifikasi rendah.
+
 
 ---
 <p align="center">

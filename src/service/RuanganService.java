@@ -18,13 +18,12 @@ public class RuanganService {
     }
 
     /** Menambah ruangan baru */
-    public Ruangan tambahRuangan(String namaRuangan, String tipeKamar, 
-                                  int kapasitas) throws Exception {
-        String error = Validator.validasiRuangan(namaRuangan, tipeKamar, kapasitas);
+    public Ruangan tambahRuangan(String nama, String tipe, int lantai, double harga, String fasilitas) throws Exception {
+        String error = Validator.validasiRuangan(nama, tipe, lantai, harga, fasilitas);
         if (error != null) throw new Exception(error);
 
         String id = IDGenerator.generateRuanganId();
-        Ruangan ruangan = new Ruangan(id, namaRuangan.trim(), tipeKamar, kapasitas);
+        Ruangan ruangan = new Ruangan(id, nama, tipe, lantai, harga, fasilitas);
         ruanganRepo.save(ruangan);
         return ruangan;
     }

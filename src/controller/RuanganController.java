@@ -16,8 +16,8 @@ public class RuanganController {
         this.ruanganService = ServiceFactory.getInstance().getRuanganService();
     }
 
-    public Ruangan tambahRuangan(String nama, String tipe, int kapasitas) throws Exception {
-        return ruanganService.tambahRuangan(nama, tipe, kapasitas);
+    public Ruangan tambahRuangan(String nama, String tipe, int lantai, double harga, String fasilitas) throws Exception {
+        return ruanganService.tambahRuangan(nama, tipe, lantai, harga, fasilitas);
     }
 
     public Ruangan cariById(String id) throws Exception {

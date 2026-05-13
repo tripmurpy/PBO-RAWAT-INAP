@@ -36,44 +36,56 @@ public class KunjunganScreen extends Form implements CommandListener {
             if (list.size() == 0) {
                 append(new StringItem("", "Belum ada riwayat kunjungan."));
             } else {
-                append(new StringItem("",
-                        new StringBuffer().append("Total: ").append(list.size()).append(" kunjungan\n").toString()));
+                StringItem headerTotal = new StringItem("", "Total: " + list.size() + " kunjungan");
+                headerTotal.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER);
+                append(headerTotal);
+
                 for (int i = 0; i < list.size(); i++) {
                     Kunjungan k = (Kunjungan) list.elementAt(i);
-                    StringBuffer sb = new StringBuffer();
-                    sb.append("No. RM  : ").append(k.getNoRMPasien()).append("\n");
-                    sb.append("Admisi  : ").append(k.getIdAdmisi()).append("\n");
-                    sb.append("Masuk   : ").append(DateUtil.formatTanggal(k.getTglMasuk())).append("\n");
+                    
+                    StringItem sepTop = new StringItem("", "=======================");
+                    sepTop.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
+                    append(sepTop);
+
+                    append(new StringItem("Kunjungan", "#" + (i + 1)));
+                    append(new StringItem("No. RM", k.getNoRMPasien()));
+                    append(new StringItem("Admisi", k.getIdAdmisi()));
+                    append(new StringItem("Masuk", DateUtil.formatTanggal(k.getTglMasuk())));
                     if (k.getTglKeluar() > 0) {
-                        sb.append("Keluar  : ").append(DateUtil.formatTanggal(k.getTglKeluar())).append("\n");
-                        sb.append("Rawat   : ").append(k.getLamaRawat()).append(" hari\n");
+                        append(new StringItem("Keluar", DateUtil.formatTanggal(k.getTglKeluar())));
+                        append(new StringItem("Rawat", k.getLamaRawat() + " hari"));
                     }
-                    sb.append("Status  : ").append(k.getStatus()).append("\n");
-                    sb.append("Diagnosa: ").append(k.getDiagnosis());
+                    append(new StringItem("Status", k.getStatus()));
+                    append(new StringItem("Diagnosa", k.getDiagnosis() != null ? k.getDiagnosis() : "-"));
 
-                    // Informasi pembayaran (jika sudah selesai)
                     if (k.getBiayaTotal() > 0) {
-                        sb.append("\n\n--- RINCIAN BIAYA ---\n");
-                        if (k.getBiayaRuangan() > 0) {
-                            sb.append("- Kamar   : Rp ").append(formatHarga(k.getBiayaRuangan())).append("\n");
-                            sb.append("- Makan   : Rp ").append(formatHarga(k.getBiayaMakanan())).append("\n");
-                            sb.append("- Obat/Vit: Rp ").append(formatHarga(k.getBiayaObat())).append("\n");
-                            sb.append("- Admin   : Rp ").append(formatHarga(k.getBiayaAdmin())).append("\n");
-                        }
-                        sb.append("TOTAL     : Rp ").append(formatHarga(k.getBiayaTotal())).append("\n");
-                        sb.append("Bayar     : ").append(
-                                k.getTipePembayaran() != null && k.getTipePembayaran().length() > 0
-                                        ? k.getTipePembayaran() : "-");
-                        if (k.getNamaBank() != null && k.getNamaBank().length() > 0) {
-                            sb.append(" (").append(k.getNamaBank()).append(")");
-                        }
-                        sb.append("\n[LUNAS]");
-                    }
+                        StringItem sepBiayaTop = new StringItem("", "--- RINCIAN BIAYA ---");
+                        sepBiayaTop.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
+                        append(sepBiayaTop);
 
-                    StringItem si = new StringItem(
-                            new StringBuffer().append("--- #").append(i + 1).append(" ---").toString(), sb.toString());
-                    append(si);
-                    append(new Spacer(getWidth(), 5));
+                        if (k.getBiayaRuangan() > 0) {
+                            append(new StringItem("Kamar", "Rp " + formatHarga(k.getBiayaRuangan())));
+                            append(new StringItem("Makan", "Rp " + formatHarga(k.getBiayaMakanan())));
+                            append(new StringItem("Obat/Vit", "Rp " + formatHarga(k.getBiayaObat())));
+                            append(new StringItem("Admin", "Rp " + formatHarga(k.getBiayaAdmin())));
+                        }
+
+                        StringItem sepBiayaBot = new StringItem("", "-----------------------");
+                        sepBiayaBot.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
+                        append(sepBiayaBot);
+
+                        append(new StringItem("TOTAL", "Rp " + formatHarga(k.getBiayaTotal())));
+                        
+                        String bayar = k.getTipePembayaran() != null && k.getTipePembayaran().length() > 0 ? k.getTipePembayaran() : "-";
+                        if (k.getNamaBank() != null && k.getNamaBank().length() > 0) {
+                            bayar += " (" + k.getNamaBank() + ")";
+                        }
+                        append(new StringItem("Bayar", bayar));
+                        append(new StringItem("Status", "[LUNAS]"));
+                    }
+                    StringItem sepBot = new StringItem("", "=======================\n");
+                    sepBot.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_NEWLINE_BEFORE);
+                    append(sepBot);
                 }
             }
         } catch (Exception e) {

@@ -121,7 +121,7 @@ public class SeedData {
             Pasien p1 = new Pasien(noRM1, "Yosia Siahaan",
                     mkDate(1995, 3, 14), "Laki-laki",
                     "Jl. Sisingamangaraja No. 12, Medan",
-                    "0812-3456-7890", "BPJS");
+                    "0812-3456-7890", "BPJS", "Bpk. Siahaan", "0812-1111-2222");
             p1.setDokterPenanggungJawab("dr. Bayushi Eka P, Sp.JP(K)");
             p1.setKamarRawat("A21");
             p1.setStatus(Pasien.STATUS_DIRAWAT);
@@ -133,7 +133,7 @@ public class SeedData {
             Pasien p2 = new Pasien(noRM2, "Joachim Simson Ririhena",
                     mkDate(1988, 11, 7), "Laki-laki",
                     "Jl. Patimura No. 45, Ambon",
-                    "0813-9988-7766", "Asuransi Swasta");
+                    "0813-9988-7766", "Asuransi Swasta", "Ibu Ririhena", "0813-3333-4444");
             p2.setDokterPenanggungJawab("dr. Radhiyatam M, Sp.PD");
             p2.setKamarRawat("A14");
             p2.setStatus(Pasien.STATUS_DIRAWAT);
@@ -145,7 +145,7 @@ public class SeedData {
             Pasien p3 = new Pasien(noRM3, "Margaretha Susanti",
                     mkDate(2001, 6, 22), "Perempuan",
                     "Jl. Gatot Subroto Blok C No. 3, Jakarta",
-                    "0819-1122-3344", "BPJS");
+                    "0819-1122-3344", "BPJS", "Bpk. Santoso", "0819-5555-6666");
             p3.setDokterPenanggungJawab("dr. Anggun Mekar K, Sp.PD");
             p3.setKamarRawat("A31");
             p3.setStatus(Pasien.STATUS_DIRAWAT);
@@ -157,7 +157,7 @@ public class SeedData {
             Pasien p4 = new Pasien(noRM4, "Bambang Prasetyo",
                     mkDate(1979, 1, 10), "Laki-laki",
                     "Jl. Raya Bogor KM 32, Depok",
-                    "0856-7788-9900", "Umum");
+                    "0856-7788-9900", "Umum", "Ibu Prasetyo", "0856-7777-8888");
             p4.setDokterPenanggungJawab("dr. Johannes R, Sp.A");
             p4.setKamarRawat("A22");
             p4.setStatus(Pasien.STATUS_DIRAWAT);
@@ -169,7 +169,7 @@ public class SeedData {
             Pasien p5 = new Pasien(noRM5, "Felicia Tanujaya",
                     mkDate(1992, 8, 3), "Perempuan",
                     "Jl. Sudirman Blok M No. 7, Surabaya",
-                    "0822-6655-4433", "Asuransi Swasta");
+                    "0822-6655-4433", "Asuransi Swasta", "Bpk. Tanujaya", "0822-9999-0000");
             p5.setDokterPenanggungJawab("dr. Christine Natalita, Sp.A");
             p5.setKamarRawat("A44");
             p5.setStatus(Pasien.STATUS_DIRAWAT);
@@ -181,7 +181,7 @@ public class SeedData {
             Pasien p6 = new Pasien(noRM6, "Rudi Hartono",
                     mkDate(1985, 2, 28), "Laki-laki",
                     "Jl. Ahmad Yani No. 88, Bandung",
-                    "0878-2233-4455", "BPJS");
+                    "0878-2233-4455", "BPJS", "Ibu Hartono", "0878-1122-3344");
             p6.setDokterPenanggungJawab("dr. Hilda Sasdyanita, Sp.OT");
             p6.setKamarRawat("A32");
             p6.setStatus(Pasien.STATUS_DIRAWAT);

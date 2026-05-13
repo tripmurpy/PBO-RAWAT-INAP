@@ -20,6 +20,9 @@ public class Pasien extends Person {
     private String status;
     private String dokterPenanggungJawab;
     private String kamarRawat;
+    private String keluhan;
+    private String namaWali;
+    private String noTelpWali;
 
     public Pasien() {
         this.status = STATUS_AKTIF;
@@ -27,14 +30,17 @@ public class Pasien extends Person {
 
     public Pasien(String noRM, String nama, long tglLahir,
             String jenisKelamin, String alamat,
-            String noTelp, String asuransi) {
+            String noTelp, String asuransi, String namaWali, String noTelpWali) {
         super(noRM, nama, tglLahir, jenisKelamin);
         this.alamat = alamat;
         this.noTelp = noTelp;
         this.asuransi = asuransi;
+        this.namaWali = namaWali;
+        this.noTelpWali = noTelpWali;
         this.status = STATUS_AKTIF;
         this.dokterPenanggungJawab = "";
         this.kamarRawat = "";
+        this.keluhan = "";
     }
 
     // noRM is the id field from Entity
@@ -100,6 +106,30 @@ public class Pasien extends Person {
 
     public void setKamarRawat(String kamarRawat) {
         this.kamarRawat = kamarRawat;
+    }
+
+    public String getKeluhan() {
+        return keluhan;
+    }
+
+    public void setKeluhan(String keluhan) {
+        this.keluhan = keluhan;
+    }
+
+    public String getNamaWali() {
+        return namaWali;
+    }
+
+    public void setNamaWali(String namaWali) {
+        this.namaWali = namaWali;
+    }
+
+    public String getNoTelpWali() {
+        return noTelpWali;
+    }
+
+    public void setNoTelpWali(String noTelpWali) {
+        this.noTelpWali = noTelpWali;
     }
 
     public boolean isAktif() {

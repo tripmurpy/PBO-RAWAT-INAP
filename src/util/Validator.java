@@ -25,7 +25,7 @@ public class Validator {
      * @return pesan error, atau null jika valid
      */
     public static String validasiPasien(String nama, String tglLahir, 
-            String jenisKelamin, String alamat, String noTelp) {
+            String jenisKelamin, String alamat, String noTelp, String keluhan) {
 
         if (kosong(nama)) {
             return "Nama lengkap wajib diisi";
@@ -79,16 +79,9 @@ public class Validator {
      * Validasi data ruangan.
      * @return pesan error, atau null jika valid
      */
-    public static String validasiRuangan(String namaRuangan, String tipeKamar, int kapasitas) {
-        if (kosong(namaRuangan)) {
-            return "Nama ruangan wajib diisi";
-        }
-        if (kosong(tipeKamar)) {
-            return "Tipe kamar wajib diisi";
-        }
-        if (kapasitas <= 0) {
-            return "Kapasitas harus lebih dari 0";
-        }
+    public static String validasiRuangan(String nama, String tipe, int lantai, double harga, String fasilitas) {
+        if (nama == null || nama.trim().length() == 0) return "Nama ruangan harus diisi";
+        if (harga < 0) return "Harga tidak boleh negatif";
         return null;
     }
 

@@ -2,51 +2,50 @@ package util.ui;
 
 import javax.microedition.lcdui.*;
 import model.Ruangan;
-import service.RuanganService;
 import util.ServiceFactory;
 
 /**
- * RuanganEditScreen — Form untuk mengedit ruangan.
+ * RuanganEditScreen — Form edit data ruangan.
  */
 public class RuanganEditScreen extends Form implements CommandListener {
 
-    private RuanganService service;
     private Ruangan ruangan;
-    private TextField tfNama, tfKapasitas, tfNamaPasien;
-    private ChoiceGroup cgStatus;
+    private TextField tfNama, tfLantai, tfHarga, tfFasilitas;
+    private ChoiceGroup cgTipe;
     private Command cmdSimpan, cmdBatal;
 
     public RuanganEditScreen(Ruangan r) {
-        super("EDIT KAMAR: " + r.getNamaRuangan());
-        this.service = ServiceFactory.getInstance().getRuanganService();
+        super("EDIT RUANGAN: " + r.getNamaRuangan());
         this.ruangan = r;
 
-        tfNama = new TextField("Nama/Nomor Kamar", r.getNamaRuangan(), 20, TextField.ANY);
-        tfKapasitas = new TextField("Kapasitas", String.valueOf(r.getKapasitas()), 3, TextField.NUMERIC);
+        tfNama = new TextField("Nama Ruangan", r.getNamaRuangan(), 10, TextField.ANY);
+        cgTipe = new ChoiceGroup("Tipe Kamar", ChoiceGroup.POPUP);
+        cgTipe.append("VIP", null);
+        cgTipe.append("VVIP", null);
+        cgTipe.append("Kelas I", null);
+        cgTipe.append("Kelas II", null);
+        cgTipe.append("Kelas III", null);
         
-        cgStatus = new ChoiceGroup("Status", ChoiceGroup.EXCLUSIVE);
-        cgStatus.append(Ruangan.STATUS_KOSONG, null);
-        cgStatus.append(Ruangan.STATUS_TERISI, null);
-        cgStatus.append(Ruangan.STATUS_MAINTENANCE, null);
-        
-        if (r.getStatusKamar().equals(Ruangan.STATUS_TERISI)) {
-            cgStatus.setSelectedIndex(1, true);
-        } else if (r.getStatusKamar().equals(Ruangan.STATUS_MAINTENANCE)) {
-            cgStatus.setSelectedIndex(2, true);
-        } else {
-            cgStatus.setSelectedIndex(0, true);
+        // Select current type
+        for (int i = 0; i < cgTipe.size(); i++) {
+            if (cgTipe.getString(i).equals(r.getTipeKamar())) {
+                cgTipe.setSelectedIndex(i, true);
+                break;
+            }
         }
 
-        tfNamaPasien = new TextField("Nama Pasien (Jika Terisi)", r.getNamaPasien(), 50, TextField.ANY);
+        tfLantai = new TextField("Lantai", "1", 2, TextField.NUMERIC);
+        tfHarga = new TextField("Harga Per Malam (Rp)", String.valueOf((long)r.getHarga()), 15, TextField.NUMERIC);
+        tfFasilitas = new TextField("Fasilitas", r.getFasilitas(), 100, TextField.ANY);
 
         append(tfNama);
-        append(tfKapasitas);
-        append(cgStatus);
-        append(tfNamaPasien);
+        append(cgTipe);
+        append(tfLantai);
+        append(tfHarga);
+        append(tfFasilitas);
 
         cmdSimpan = new Command("Simpan", Command.OK, 1);
         cmdBatal = new Command("Batal", Command.BACK, 2);
-        
         addCommand(cmdSimpan);
         addCommand(cmdBatal);
         setCommandListener(this);
@@ -56,30 +55,28 @@ public class RuanganEditScreen extends Form implements CommandListener {
         if (c == cmdBatal) {
             ScreenManager.getInstance().kembali();
         } else if (c == cmdSimpan) {
-            try {
-                ruangan.setNamaRuangan(tfNama.getString());
-                ruangan.setKapasitas(Integer.parseInt(tfKapasitas.getString()));
-                String status = cgStatus.getString(cgStatus.getSelectedIndex());
-                ruangan.setStatusKamar(status);
-                
-                if (status.equals(Ruangan.STATUS_KOSONG)) {
-                    ruangan.setKosong(true);
-                } else if (status.equals(Ruangan.STATUS_TERISI)) {
-                    ruangan.setNamaPasien(tfNamaPasien.getString());
-                } else {
-                    ruangan.setNamaPasien("");
-                }
-                
-                service.updateRuangan(ruangan);
-                
-                Alert alert = new Alert("BERHASIL", "Kamar berhasil diupdate!", null, AlertType.CONFIRMATION);
-                alert.setTimeout(2000);
-                ScreenManager.getInstance().getDisplay().setCurrent(alert, new RuanganScreen());
-            } catch (Exception e) {
-                Alert alert = new Alert("ERROR", e.getMessage(), null, AlertType.ERROR);
-                alert.setTimeout(3000);
-                ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
-            }
+            prosesSimpan();
+        }
+    }
+
+    private void prosesSimpan() {
+        try {
+            ruangan.setNamaRuangan(tfNama.getString());
+            ruangan.setTipeKamar(cgTipe.getString(cgTipe.getSelectedIndex()));
+            ruangan.setHarga(Double.parseDouble(tfHarga.getString()));
+            ruangan.setFasilitas(tfFasilitas.getString());
+
+            ServiceFactory.getInstance().getRuanganService().updateRuangan(ruangan);
+
+            Alert alert = new Alert("BERHASIL", "Data ruangan berhasil diperbarui.", null, AlertType.CONFIRMATION);
+            alert.setTimeout(2000);
+            ScreenManager.getInstance().getDisplay().setCurrent(alert);
+            ScreenManager.getInstance().kembali();
+
+        } catch (Exception e) {
+            Alert alert = new Alert("ERROR", e.getMessage(), null, AlertType.ERROR);
+            alert.setTimeout(3000);
+            ScreenManager.getInstance().getDisplay().setCurrent(alert, this);
         }
     }
 }
